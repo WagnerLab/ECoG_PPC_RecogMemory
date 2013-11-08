@@ -56,10 +56,10 @@ data.meZBAC = nan(nChans,nWin);
 nConfPoints     = 9;
 data.confPoints = linspace(0.1,0.9,nConfPoints);
 
-data.mHsACbyConf   = nan(nChans,nWin,nConfPoints);
-data.sdHsACbyConf  = nan(nChans,nWin,nConfPoints);
-data.mCRsACbyConf  = nan(nChans,nWin,nConfPoints);
-data.sdCRsACbyConf = nan(nChans,nWin,nConfPoints);
+data.mHsAACbyConf   = nan(nChans,nWin,nConfPoints);
+data.sdHsAACbyConf  = nan(nChans,nWin,nConfPoints);
+data.mCRsAACbyConf  = nan(nChans,nWin,nConfPoints);
+data.sdCRsAACbyConf  = nan(nChans,nWin,nConfPoints);
 
 % incorrect trial performance; higher means
 data.FAmeBAC        = nan(nChans,nWin);
@@ -112,6 +112,7 @@ for s = 1:nSubjs
             data.sdBAC(ChCount,bi)   = sd;
             data.mZBAC(ChCount,bi)   = (m-0.5) /sd;
             data.meZBAC(ChCount,bi)  = (me-0.5)/sd;
+            data.mHaccByProb(ChCount,bi)
             
             if opts.toolboxNum~=4
                 
@@ -189,11 +190,10 @@ for s = 1:nSubjs
                 end
                 
                 [acc1, acc0]     = accByConf(probBootMat,data.Y{s}, data.confPoints);
-                
-                data.mHsACbyConf(ChCount,bi,:)     = nanmean(acc1);
-                data.sdHsACbyConf(ChCount,bi,:)    = nanstd(acc1);
-                data.mCRsACbyConf(ChCount,bi,:)    = nanmean(acc0);
-                data.sdCRsACbyConf(ChCount,bi,:)   = nanstd(acc0);
+                data.mHsAACbyConf(ChCount,bi,:)     = nanmean(acc1);
+                data.sdHsAACbyConf(ChCount,bi,:)    = nanstd(acc1);
+                data.mCRsAACbyConf  = nan(nChans,nWin,nConfPoints);
+                data.sdCRsAACbyConf  = nan(nChans,nWin,nConfPoints);
                 
                 if opts.toolboxNum==3
                     data.elModel(ChCount,bi,:,:)    = median(model,3);
