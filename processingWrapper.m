@@ -610,11 +610,14 @@ fileName = ['allSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.ban
 save([savePath fileName],'S')
 
 %% summarize performance
+
+addpath Classification/
+
 opts                = [];
 opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'lgam'};
+opts.dataType       = 'power'; opts.bands          = {'hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'erp','hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 opts.toolboxNum     = 1;
