@@ -50,7 +50,7 @@ data.blockOffset(1)     =0;
 
 refChan = data.chanInfo.refChannel; data.refChan = refChan;
 
-data.savepath = ['/Users/alexgonzalez/Documents/ECOG/Results/' ...
+data.savepath = ['../Results/' ...
     'ERP_Data/subj' data.subjnum '/BandPassedSignals/'];
 
 if ~exist(data.savepath,'dir'), mkdir(data.savepath),end;

@@ -16,7 +16,7 @@ dateStr = '17-Jun-2013';
 subjects = {'17b','19','29'};
 %reference = 'origCAR'; nRefChans = 0;
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 for s = subjects
     dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' dateStr '.mat']);
     if strcmp(reference,'nonLPCleasL1TvalCh')
@@ -41,7 +41,7 @@ reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 %reference = 'origCAR'; nRefChans = 0;
 %reference = 'allChCAR'; nRefChans = 0;
 lockType = 'RT'; %{'stim','RT'}
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 analysisType = 'Amp';%{'Amp','Power', 'logPower'};
 baselineType = 'sub';%{'rel','sub'}
 for s = subjects
@@ -80,7 +80,7 @@ baselineType = 'sub';
 analysisType = 'Amp';
 reference = 'allChCAR'; nRefChans = 0;
 %reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 
 for s = subjects
     load([dataPath 'ERP_Data/subj' s{1} '/ERPs' lockType 'Lock' baselineType analysisType ...
@@ -99,13 +99,14 @@ for s = subjects
 end
 
 %% plot erps
+addpath Plotting/
 close all
 dateStr = '27-May-2013'; subjects = {'16b','18','24','28'};
 %dateStr = '17-Jun-2013'; subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 %reference = 'origCAR'; nRefChans = 0;
 
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 opts                = [];
 opts.plotPath       = [dataPath 'Plots/ERPs/'];
 opts.type           = 'erp';
@@ -131,12 +132,12 @@ subjects = {'16b'};
 %dateStr = '17-Jun-2013';
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 for s = subjects
     dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
     for band = {'delta'}%{'delta','theta','alpha','beta','lgam','hgam','bb'};
         data = dataDecompose(dataIn.data,band{1});
-        %save([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1} reference num2str(nRefChans) dateStr '.mat'],'data')
+        save([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1} reference num2str(nRefChans) dateStr '.mat'],'data')
     end
 end
 
@@ -150,7 +151,7 @@ subjects = {'16b','18','24','28'};
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 lockType = 'RT';
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 analysisType = 'logPower';%{'Amp','Power', 'logPower'};
 baselineType = 'sub';%{'rel','sub'}
 for s = subjects
@@ -181,7 +182,7 @@ subjects = {'16b','18','24','28'};
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 
 opts = [];
 opts.plotPath = [dataPath 'Plots/Spectral/'];
@@ -205,27 +206,26 @@ addpath Analysis/
 addpath lib/
 
 bands = {'erp','hgam','delta','theta','alpha','beta','lgam'};
+
+opts = [];
+opts.hems = 'all';
+opts.lockType = 'RT';
+opts.reference = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
+opts.subjects       = {'16b','18','24','28','17b','19', '29'};
+opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
+
+dataPath = '../Results/';
+if strcmp(opts.type,'erp')
+    dataPath = [dataPath 'ERP_Data/group/'];
+else
+    dataPath = [dataPath 'Spectral_Data/group/'];
+end
 for ba = 1:numel(bands)
+    opts.type   = bands{ba};    
+    data        = groupLPCData(opts);  
+    fileName    = [opts.hems data.prefix 'Group' data.extension];
     
-    opts = [];
-    opts.hems = 'all';
-    opts.lockType = 'RT';
-    opts.reference = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-    opts.type = bands{ba};
-    opts.subjects       = {'16b','18','24','28','17b','19', '29'};
-    opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
-    
-    dataPath = '~/Documents/ECOG/Results/';
-    if strcmp(opts.type,'erp')
-        dataPath = [dataPath 'ERP_Data/group/'];
-    else
-        dataPath = [dataPath 'Spectral_Data/group/'];
-    end
-    data = groupLPCData(opts);
-    
-    fileName = [opts.hems data.prefix 'Group' data.extension];
-    save([dataPath fileName '.mat'],'data')
-    
+    save([dataPath fileName '.mat'],'data')    
     fprintf('grouping data completed for %s\n',opts.type)
 end
 
@@ -233,7 +233,7 @@ end
 
 close all
 opts                = [];
-opts.mainPath       = '~/Documents/ECOG/Results/Plots/Renderings/channels/' ;
+opts.mainPath       = '../Results/Plots/Renderings/channels/' ;
 opts.level          = 'subj'; %{'group','subj'}
 opts.cortexType     = 'MNI'; %{'Native','MNI'}
 opts.chanNumLabel   = false; %{true,false}
@@ -253,7 +253,7 @@ dateStr = '17-Jun-2013';
 subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 lockType = 'stim';
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 
 for s = subjects
     for band = {'delta','theta','alpha'}%{'delta','theta','alpha','beta','lgam','hgam','bb'};
@@ -301,7 +301,7 @@ dateStr = '17-Jun-2013';
 subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 lockType = 'stim';
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 
 for s = subjects
     for AmpBand = {'hgam'}
@@ -343,7 +343,7 @@ for bands = {'delta','theta','alpha','beta'}
     opts.hemId = hemId(snums);
     opts.subjects = subjects(snums);
     
-    dataPath = '~/Documents/ECOG/Results/ITC_Data/group/';
+    %dataPath = '../Results/ITC_Data/group/';
     
     %data = groupLPC_ITCData(opts);
     
@@ -370,7 +370,7 @@ opts.aRatio         = [500 300];
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
 
-opts.mainPath = '~/Documents/ECOG/Results/' ;
+opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
     opts.measType       = 'm';      % {'m','z','c','Zc'}
     opts.comparisonType = 'ZStat';  % {ZStat,ZcStat}
@@ -427,6 +427,8 @@ conditionBarPlotsWrapper (data, opts)
 
 %% Bar accross bands per ROI accross multiple bands
 
+addpath Plotting/
+
 close all
 opts                = [];
 opts.hems           = 'l';
@@ -442,7 +444,7 @@ opts.aRatio         = [50 300];
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
 
-opts.mainPath = '~/Documents/ECOG/Results/' ;
+opts.mainPath = '../Results/' ;
 
 opts.measType       = 'm';     % {'m','z','c','Zc'}
 opts.comparisonType = 'ZStat'; % {ZStat,ZcStat}
@@ -495,7 +497,7 @@ opts.resolution     = 400;
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
 
-opts.mainPath = '~/Documents/ECOG/Results/' ;
+opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
     opts.baselineType   = 'sub';
     opts.analysisType   = 'Amp';
@@ -547,7 +549,7 @@ switch opts.lockType
 end
 
 
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 if strcmp(opts.type,'erp')
     dataPath = [dataPath 'ERP_Data/group/'];
     fileName = [opts.hems 'ERPsGroup' opts.lockType 'LocksubAmp' ...
@@ -565,7 +567,7 @@ end
 load([dataPath fileName])
 clc
 printStats(data,opts)
-savePath = '~/Documents/ECOG/Results/Rdata/';
+savePath = '../Results/Rdata/';
 blockStr = {'bySubj','byBlock'}; blockStr = blockStr{opts.byBlockFlag+1};
 out = exportLPCData2R(data,opts);
 csvwrite([savePath opts.bin timeStr fileName blockStr '.csv'],single(out));
@@ -600,11 +602,10 @@ opts.timeFeatures   = 'trial';
 
 S = ClassificationWrapper(opts);
 
-savePath = ['~/Documents/ECOG/Results/Classification/group/' opts.dataType ...
+savePath = ['../Results/Classification/group/' opts.dataType ...
     '/' opts.channelGroupingType '/'];
 if ~exist(savePath,'dir'),mkdir(savePath), end
-% fileName = ['allSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
-%     opts.timeType '_gT' opts.channelGroupingType '_Solver' S.extStr];
+
 fileName = ['allSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
     opts.timeType '_gT' opts.channelGroupingType '_Solver' S.extStr];
 save([savePath fileName],'S')
@@ -626,13 +627,11 @@ opts.channelGroupingType      = 'channel';
 opts.timeFeatures   = 'trial';
 opts.extStr         = 'liblinearS0';%'NNDTWK5';%
 
-dataPath = ['~/Documents/ECOG/Results/Classification/group/' opts.dataType ...
+dataPath = ['../Results/Classification/group/' opts.dataType ...
     '/' opts.channelGroupingType '/'];
 
 fileName = ['allSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
     opts.timeType '_gT' opts.channelGroupingType '_Solver' opts.extStr];
-% fileName = ['allSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
-%     opts.timeType '_gT' opts.channelGroupingType '_Solver' opts.extStr];
 
 load([dataPath fileName])
 S = SummaryClassification(S,opts);
@@ -670,7 +669,7 @@ opts.channelGroupingType      = 'channel';
 opts.timeFeatures   = 'trial';
 opts.extStr         = 'liblinearS0';%'NNDTW_K5';
 
-dataPath = ['~/Documents/ECOG/Results/Classification/group/' opts.dataType ...
+dataPath = ['../Results/Classification/group/' opts.dataType ...
     '/' opts.channelGroupingType '/'];
 
 fileName = ['SumallSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
@@ -703,7 +702,7 @@ opts.channelGroupingType      = 'channel';
 opts.timeFeatures   = 'trial';
 opts.extStr         = 'liblinearS0';%'NNDTW_K5';
 
-dataPath = ['~/Documents/ECOG/Results/Classification/group/'];
+dataPath = ['../Results/Classification/group/'];
 
 fileName1 = [ opts.dataType1 '/' opts.channelGroupingType '/' 'SumallSubjsClass' ...
     opts.lockType1 'Lock' opts.dataType1 cell2mat(opts.bands1) '_tF' opts.timeFeatures ...
@@ -741,7 +740,7 @@ opts.extStr         = 'liblinearS0';
 opts.analysis       = 'trial';
 
 % load decoding structure
-dataPath = ['~/Documents/ECOG/Results/Classification/group/' opts.dataType ...
+dataPath = ['../Results/Classification/group/' opts.dataType ...
     '/' opts.channelGroupingType '/'];
 
 fileName = ['SumallSubjsClass' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
@@ -751,7 +750,7 @@ opts.fileName = fileName;
 load([dataPath fileName])
 
 % load data structure
-dataPath = '~/Documents/ECOG/Results/';
+dataPath = '../Results/';
 if strcmp(opts.dataType,'erp')
     dataPath = [dataPath 'ERP_Data/group/'];
     fileName = [opts.hems 'ERPsGroup' opts.lockType 'LocksubAmp' ...
@@ -765,7 +764,7 @@ load([dataPath fileName])
 
 out = matchChannelPatterns(data,S,opts);
 
-savePath = '~/Documents/ECOG/Results/lagAnalysis/';
+savePath = '../Results/lagAnalysis/';
 if ~exist(savePath,'dir'), mkdir(savePath), end;
 fileName = ['lag' opts.analysis 'Analysis' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands)];
 save([savePath fileName])
