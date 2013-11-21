@@ -639,22 +639,25 @@ fileName = ['Sum' fileName];
 save([dataPath fileName],'S')
 
 %% plot decoding results
+
+addpath lib/
+
 opts                = [];
 opts.lockType       = 'stim';
 opts.scoreType      = 'mBAC'; % RTsLogitCorr mBAC
-opts.accPlots       = true;
+opts.accPlots       = false;
 opts.weigthsPlots   = false;
 opts.renderPlot     = false;
 opts.RTcorrPlots    = false;
-opts.stats          = false;
+opts.stats          = true;
 opts.baseLineY      = 0;
 opts.rendLimits     = [-0.25 0.25];
 opts.resolution     = 400;
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.toolboxNum     = 1;
 %opts.dataType       = 'erp'; opts.bands          = {''};
-opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-%opts.dataType       = 'power'; opts.bands          = {'erp','hgam'};
+%opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
+opts.dataType       = 'power'; opts.bands          = {'hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 
@@ -679,7 +682,7 @@ opts.fileName = fileName;
 load([dataPath fileName])
 
 close all
-% plotDecodingAcc(S,opts)
+plotDecodingAcc(S,opts)
 %plotFA_MISS_relationToACC
 
 %% plot relationship between channel accuracies
@@ -688,9 +691,9 @@ opts                = [];
 opts.lockType1       = 'stim';
 opts.dataType1       = 'power'; opts.bands1        = {'hgam'};
 %opts.dataType1       = 'power'; opts.bands1          = {'delta','theta','alpha','beta','lgam','hgam'};
-opts.lockType2       = 'stim';
-%opts.dataType2       = 'power'; opts.bands2        = {'hgam'};
-opts.dataType2       = 'power'; opts.bands2          = {'delta','theta','alpha','beta','lgam','hgam'};
+opts.lockType2       = 'RT';
+opts.dataType2       = 'power'; opts.bands2        = {'hgam'};
+%opts.dataType2       = 'power'; opts.bands2          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 opts.subjects       = [1:4]; % left subjects
 opts.ROIs           = [1 2]; % roi 1 and 2, IPS and SPL
@@ -721,7 +724,7 @@ data2 = S;
 
 opts.savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/individualPlotsPDFs';
 close all
-plotACCRelationshipWrapper(data1,data2,opts)
+%plotACCRelationshipWrapper(data1,data2,opts)
 
 %% find IPS / SPL time segment matches
 

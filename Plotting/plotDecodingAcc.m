@@ -12,7 +12,7 @@ colors.Bdots= ones(1,3)*0.4;
 nBoot = data.classificationParams.nBoots;
 
 %% load data to obtain cortex and channel locations
-temp = load('/Users/alexg8/Documents/ECOG/Results/ERP_Data/group/allERPsGroupstimLocksubAmpnonLPCleasL1TvalCh10.mat');
+temp = load('../Results/ERP_Data/group/allERPsGroupstimLocksubAmpnonLPCleasL1TvalCh10.mat');
 chanLocs    =  temp.data.MNILocs;
 cortex{1}   =  temp.data.lMNIcortex;
 cortex{2}   =  temp.data.rMNIcortex;
@@ -20,11 +20,10 @@ hem_str     = {'l','r'};
 view{1}     = [310,30];
 view{2}     = [50,30];
 
-addpath '/Users/alexg8/Documents/ECOG/scripts/Doras_rendering_scripts/render_brains/'
 temp        = load ('loc_colormap3.mat');
 clmap       = temp.cm;
 
-mainPath    = '~/Documents/ECOG/Results/Plots/Classification/channel/';
+mainPath    = '../Results/Plots/Classification/channel/';
 
 %%
 Y       = data.(opts.scoreType);
