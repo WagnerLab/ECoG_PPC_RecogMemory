@@ -526,6 +526,58 @@ load([opts.dataPath fileName])
 if ~exist(opts.renderPath,'dir'),mkdir(opts.renderPath),end
 renderERPs(data,opts)
 
+%% cluster channels
+addpath Plotting/
+addpath Analysis//
+close all
+
+opts                = [];
+opts.hems            = 'l'; opts.hemNum=1;
+opts.ROIs           = [1 2];
+opts.lockType       = 'stim';
+opts.type           = 'power';
+opts.band           = 'hgam';
+opts.dtype          = 'ZStat';
+opts.smoothData     = true;
+opts.reference      = 'nonLPCleasL1TvalCh';
+opts.nRefChans      = 10;
+opts.resolution     = 400;
+
+opts.mainPath = '../Results/' ;
+if strcmp(opts.type,'erp')
+    opts.measType       = 'm';      % {'m','z','c','Zc'}
+    opts.comparisonType = 'ZStat';  % {ZStat,ZcStat}
+    opts.baselineType   = 'sub';
+    opts.analysisType   = 'Amp';
+    opts.dataPath       = [opts.mainPath 'ERP_Data/group/'];
+    opts.preFix         = 'ERPs' ;
+    opts.plotPath       = [opts.mainPath 'Plots/ERPs/'  opts.hems '/'];
+    opts.band           = '';
+elseif strcmp(opts.type,'power')
+    opts.measType       = 'm';     % {'m','z','c','Zc'}
+    opts.comparisonType = 'ZStat'; % {ZStat,ZcStat}
+    opts.baselineType   = 'sub';
+    opts.analysisType   = 'logPower';
+    opts.dataPath       = [opts.mainPath 'Spectral_Data/group/'];
+    opts.preFix         = ['ERSPs' opts.band];
+    opts.plotPath       = [opts.mainPath 'Plots/Spectral/' opts.hems '/'];
+elseif strcmp(opts.type,'ITC')
+    opts.measType       = 'ITC_';
+    opts.comparisonType = 'ITC_Z';
+    opts.baselineType   = '';
+    opts.analysisType   = '';
+    opts.dataPath       = [opts.mainPath 'ITC_Data/group/'];
+    opts.preFix         = ['ITC' opts.band];
+    opts.plotPath       = [opts.mainPath 'Plots/ITC/' opts.hems '/'];
+end
+
+opts.extension = [opts.lockType 'Lock' opts.baselineType opts.analysisType opts.reference ...
+    num2str(opts.nRefChans)] ;
+fileName    = ['all' opts.preFix 'Group' opts.extension '.mat'];
+
+load([opts.dataPath fileName])
+clusterWrapper(data, opts)
+
 %% output group data to a csv file
 
 addpath Analysis/
