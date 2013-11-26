@@ -8,12 +8,17 @@ hem         = opts.hems;
 hemChans    = ismember(data.subjChans,find(strcmp(opts.hemId,opts.hems)))';
 chanCoords  = data.MNILocs(hemChans,:);
 nChans      = size(chanCoords,1);
-stat        = data.(opts.comparisonType)(hemChans,:);
+
+bins        = round(mean(data.(opts.timeType),2)*1000);
+if ~isempty(opts.avgBins)
+    stat        = mean(data.(opts.comparisonType)(hemChans,opts.avgBins),2);    
+    bins        = round(mean([bins(opts.avgBins(1)) bins(opts.avgBins(end))]))+1; 
+else
+    stat        = data.(opts.comparisonType)(hemChans,:);    
+end
 
 roiIds      = data.ROIid;
 renderType  = opts.renderType;
-
-bins        = round(mean(data.(opts.timeType),2)*1000);
 
 extension   = [opts.extension];
 nBins       = numel(bins);

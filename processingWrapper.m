@@ -357,7 +357,7 @@ end
 
 opts                = [];
 opts.hems           = 'l';
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
@@ -404,7 +404,7 @@ fileName        = ['all' opts.preFix 'Group' opts.extension '.mat'];
 load([opts.dataPath fileName])
 close all
 
-plotROI_ERPs(data,opts)
+%plotROI_ERPs(data,opts)
 
 switch opts.lockType
     case 'RT'
@@ -484,7 +484,7 @@ opts                = [];
 opts.hems           = 'l';
 opts.lockType       = 'RT';
 opts.type           = 'power';
-opts.band           = 'delta';
+opts.band           = 'theta';
 opts.comparisonType = 'BinZStat'; %{'BinTStat','BinpValT','BinpVal','BinZStat','BinpValz','BincondDiff'};
 opts.timeType       = 'Bins';
 opts.reference      = 'nonLPCleasL1TvalCh';
@@ -493,6 +493,7 @@ opts.renderType     = 'SmoothCh';%{'SmoothCh','UnSmoothCh', 'SigChans','SignChan
 opts.limitDw        = 1;
 opts.limitUp        = 5;
 opts.resolution     = 400;
+opts.avgBins        = [3:11];
 
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
@@ -542,6 +543,8 @@ opts.smoothData     = true;
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.resolution     = 400;
+opts.aRatio         = [500 300];
+opts.plotting       = false;
 
 opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
@@ -576,7 +579,7 @@ opts.extension = [opts.lockType 'Lock' opts.baselineType opts.analysisType opts.
 fileName    = ['all' opts.preFix 'Group' opts.extension '.mat'];
 
 load([opts.dataPath fileName])
-clusterWrapper(data, opts)
+out=clusterWrapper(data, opts);
 
 %% output group data to a csv file
 
@@ -695,11 +698,11 @@ save([dataPath fileName],'S')
 addpath lib/
 
 opts                = [];
-opts.lockType       = 'stim';
+opts.lockType       = 'RT';
 opts.scoreType      = 'mBAC'; % RTsLogitCorr mBAC
 opts.accPlots       = false;
 opts.weigthsPlots   = false;
-opts.renderPlot     = false;
+opts.renderPlot     = true;
 opts.RTcorrPlots    = false;
 opts.stats          = true;
 opts.baseLineY      = 0;
@@ -709,7 +712,7 @@ opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.toolboxNum     = 1;
 %opts.dataType       = 'erp'; opts.bands          = {''};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'hgam'};
+opts.dataType       = 'power'; opts.bands          = {'theta'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 
@@ -741,10 +744,10 @@ plotDecodingAcc(S,opts)
 
 opts                = [];
 opts.lockType1       = 'stim';
-opts.dataType1       = 'power'; opts.bands1        = {'hgam'};
+opts.dataType1       = 'power'; opts.bands1        = {'theta'};
 %opts.dataType1       = 'power'; opts.bands1          = {'delta','theta','alpha','beta','lgam','hgam'};
 opts.lockType2       = 'RT';
-opts.dataType2       = 'power'; opts.bands2        = {'hgam'};
+opts.dataType2       = 'power'; opts.bands2        = {'theta'};
 %opts.dataType2       = 'power'; opts.bands2          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 opts.subjects       = [1:4]; % left subjects
@@ -776,7 +779,7 @@ data2 = S;
 
 opts.savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/individualPlotsPDFs';
 close all
-%plotACCRelationshipWrapper(data1,data2,opts)
+plotACCRelationshipWrapper(data1,data2,opts)
 
 %% find IPS / SPL time segment matches
 

@@ -78,7 +78,7 @@ if opts.ROIids
     end
     plot([0.5 0.5],ylim,'--k','linewidth',2)
     set(gca,'LineWidth',2,'FontSize',16)
-    set(gca,'xtick',ticks,'ytick',[])
+    set(gca,'xtick',ticks,'xtickLabel','','ytick',[])
     %axis square
     print(gcf,'-depsc2',[opts.savePath '/' plotName1])
     
@@ -101,7 +101,7 @@ if opts.ROIids
     end
     plot(xlim,[0.5 0.5],'--k','linewidth',2)
     set(gca,'LineWidth',2,'FontSize',16)
-    set(gca,'ytick',ticks,'xtick',[])
+    set(gca,'ytick',ticks,'ytickLabel','','xtick',[])
     %axis square
     print(gcf,'-depsc2',[opts.savePath '/' plotName2])
     

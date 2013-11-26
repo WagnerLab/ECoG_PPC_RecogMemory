@@ -21,8 +21,8 @@ g = [0.2 0.6 0.3]; % green
 b = [0.1 0.5 0.8]; % blue
 r = [0.9 0.2 0.2]; % red
 k = [0.05 0.05 0.05]; % black
-l = [0.5 0.2 0.5]; % magenta
-y = [0.9 0.9 0.3]; % yellow
+y = [0.6  0.65 0.1]; % cluster1
+l = [0.1 0.65 0.6]; % cluster2
 
 colors = zeros(N,3);
 

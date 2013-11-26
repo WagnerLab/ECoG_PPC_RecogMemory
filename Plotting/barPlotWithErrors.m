@@ -38,7 +38,7 @@ for ba = 1:nBars
     n = size(X,1);
     [m(ba) se(ba)] = grpstats(X,ones(n,1),{'mean','sem'});
         
-    bar(opts.xPositions(ba),m(ba),1,'FaceColor',opts.colors(ba,:),'edgeColor', 'none', 'basevalue',opts.baseLine,'ShowBaseLine','off')
+    bar(opts.xPositions(ba),m(ba),0.95,'FaceColor',opts.colors(ba,:),'edgeColor', 'none', 'basevalue',opts.baseLine,'ShowBaseLine','off')
     plot([1 1]*opts.xPositions(ba), [-se(ba) se(ba)]+m(ba), 'color',[0 0 0],'linewidth',4)
     
 end    
