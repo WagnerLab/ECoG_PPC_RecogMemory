@@ -437,7 +437,7 @@ opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
-opts.bands           = {'delta','theta','alpha'};
+opts.bands           = {'theta'};
 opts.smoother       = 'loess';
 opts.smootherSpan   = 0.15;
 opts.yLimits        = [-6 1.5];
@@ -546,14 +546,14 @@ opts.hems            = 'l'; opts.hemNum=1;
 opts.ROIs           = [1 2];
 opts.lockType       = 'RT';
 opts.type           = 'power';
-opts.band           = 'hgam';
+opts.band           = 'theta';
 opts.dtype          = 'ZStat';
 opts.smoothData     = true;
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.resolution     = 400;
 opts.aRatio         = [500 300];
-opts.plotting       = false;
+opts.plotting       = true;
 
 opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
@@ -707,13 +707,13 @@ save([dataPath fileName],'S')
 addpath lib/
 
 opts                = [];
-opts.lockType       = 'stim';
+opts.lockType       = 'RT';
 opts.scoreType      = 'mBAC'; % RTsLogitCorr mBAC
 opts.accPlots       = false;
 opts.weigthsPlots   = false;
-opts.renderPlot     = false;
+opts.renderPlot     = true;
 opts.RTcorrPlots    = false;
-opts.stats          = true;
+opts.stats          = false;
 opts.baseLineY      = 0;
 opts.rendLimits     = [-0.25 0.25];
 opts.resolution     = 400;
@@ -721,7 +721,7 @@ opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.toolboxNum     = 1;
 %opts.dataType       = 'erp'; opts.bands          = {''};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'hgam'};
+opts.dataType       = 'power'; opts.bands          = {'theta'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 
@@ -751,6 +751,7 @@ plotDecodingAcc(S,opts)
 
 %% plot relationship between channel accuracies
 
+close all;
 opts                = [];
 opts.lockType1       = 'stim';
 opts.dataType1       = 'power'; opts.bands1        = {'theta'};

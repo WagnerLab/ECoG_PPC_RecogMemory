@@ -50,18 +50,23 @@ M2(:,1) = data2.mBAC(chans);
 M2(:,2) = data2.sdBAC(chans)/sqrt(nBoot2-1);
 
 % plot M1 vs M2
-figure(1); clf; hold on;
-set(gcf,'PaperPositionMode','auto','position',[100 100 600 600])
+figure(1); clf;
+ha = tight_subplot(2,2,[0.01 0.01], 0.01, 0.01); 
+set(gcf,'PaperPositionMode','auto','position',[100 100 800 800])
+set(ha(3),'visible','off');
+
+axes(ha(2)); hold on;
 scatterPlotWithErrors(M1,M2, cols, [lims; lims], [0.5 0.5 1]);
 %axis square
 set(gca,'yTick',ticks,'xTick',ticks)
 set(gca,'yTicklabel','','xTicklabel','')
-print(gcf,'-depsc2',[opts.savePath '/' plotName3])
 
 if opts.ROIids
     % plot M1 horizontally
-    figure(2); clf; hold on;
-    set(gcf,'PaperPositionMode','auto','position',[100 100 600 100])
+    %figure(2); clf; hold on;
+    axes(ha(4)); pos_ha=get(ha(4),'position'); hold on;
+    set(ha(4),'position',[pos_ha(1) 0.4 pos_ha(3) 0.1])  
+    %set(gcf,'PaperPositionMode','auto','position',[100 100 600 100])
     xlim(lims);ylim([0 nROIs]+0.5)
     
     cnt = 1;
@@ -80,11 +85,13 @@ if opts.ROIids
     set(gca,'LineWidth',2,'FontSize',16)
     set(gca,'xtick',ticks,'xtickLabel','','ytick',[])
     %axis square
-    print(gcf,'-depsc2',[opts.savePath '/' plotName1])
+    %print(gcf,'-depsc2',[opts.savePath '/' plotName1])
     
     % plot M2 vertically
-    figure(3); clf; hold on;
-    set(gcf,'PaperPositionMode','auto','position',[100 100 100 600])
+    %figure(3); clf; hold on;
+    axes(ha(1)); pos_ha=get(ha(1),'position'); hold on;
+    set(ha(1),'position',[0.4 pos_ha(2) 0.1 pos_ha(4)]);     
+    %set(gcf,'PaperPositionMode','auto','position',[100 100 100 600])
     xlim([0 nROIs]+0.5); ylim(lims)
     
     cnt = 1;    
@@ -103,9 +110,7 @@ if opts.ROIids
     set(gca,'LineWidth',2,'FontSize',16)
     set(gca,'ytick',ticks,'ytickLabel','','xtick',[])
     %axis square
-    print(gcf,'-depsc2',[opts.savePath '/' plotName2])
+   % print(gcf,'-depsc2',[opts.savePath '/' plotName2])
     
 end
-
-
-
+print(gcf,'-depsc2',[opts.savePath '/' plotName3])

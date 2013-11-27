@@ -23,7 +23,8 @@ load([opts.dataPath, fileName]);
 chans   = (data.hemChanId==hem)&(data.ROIid==ROInum);
 
 figure(); clf; 
-ha = tight_subplot(3,2, [0.02 0.01], 0.01, 0.01);
+set(gcf,'PaperPositionMode','auto','position',[100 100 500 150*nBands])
+ha = tight_subplot(nBands,2, [0.02 0.01], 0.01, 0.01);
 
 hacnt = 1;
 for ba = 1:nBands
