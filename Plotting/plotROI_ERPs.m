@@ -15,8 +15,8 @@ t               = data.trialTime;
 extStr          = data.extension;
 
 
-%rois        = {'AG','IPS','SPL'};
-rois        = {'IPS','SPL'};
+rois        = {'AG','IPS','SPL'};
+%rois        = {'IPS','SPL'};
 chIdx.IPS   = data.ROIid==1 & hemChans;
 chIdx.SPL   = data.ROIid==2 & hemChans;
 chIdx.AG    = data.ROIid==3 & hemChans;
@@ -34,10 +34,10 @@ figure(1); clf; %subplot(4,1,1)
 ha=tight_subplot(4,1,0.02,[0.05 0.01],[0.1 0.01]); axes(ha(1));
 set(gca,'yTickLabelMode','auto')
 set(gcf,'position',[200 200,350,1200],'PaperPositionMode','auto')
-plotNTraces(X,t,'rb',smoother,smootherSpan);
+plotNTraces(X,t,'rbg',smoother,smootherSpan);
 
 figure(2); clf;
-h = plotNTraces(X,t,'rb',smoother,smootherSpan);
+h = plotNTraces(X,t,'rbg',smoother,smootherSpan);
 if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
 set(h.f,'position',[200 200,500,300],'PaperPositionMode','auto')
 

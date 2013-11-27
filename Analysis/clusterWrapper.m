@@ -81,8 +81,9 @@ end
 out.KSPval_D = p;
 p=ranksum(abs(out.CDB(out.index==out.ROI_ids,1)),abs(out.CDB(out.index~=out.ROI_ids,1)));
 out.RSPval_D = p;
-[~,p]=ttest2(abs(out.CDB(out.index==out.ROI_ids,1)),abs(out.CDB(out.index~=out.ROI_ids,1)));
+[~,p,~,t]=ttest2(abs(out.CDB(out.index==out.ROI_ids,1)),abs(out.CDB(out.index~=out.ROI_ids,1)));
 out.TPval_D = p;
+out.Tstats = t;
 
 out.CorrectClDist = mean(abs(out.CDB(out.index==out.ROI_ids,1)));
 out.inCorrectClDist = mean(abs(out.CDB(out.index~=out.ROI_ids,1)));

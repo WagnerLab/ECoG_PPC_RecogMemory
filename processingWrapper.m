@@ -357,13 +357,13 @@ end
 
 opts                = [];
 opts.hems           = 'l';
-opts.lockType       = 'stim';
+opts.lockType       = 'RT';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
-opts.band           = 'theta';
+opts.band           = 'delta';
 opts.smoother       = 'loess';
-opts.smootherSpan   = 0.15;
+opts.smootherSpan   = 0.15;z
 opts.yLimits        = [-6 1.5];
 opts.aRatio         = [500 300];
 
@@ -404,7 +404,7 @@ fileName        = ['all' opts.preFix 'Group' opts.extension '.mat'];
 load([opts.dataPath fileName])
 close all
 
-%plotROI_ERPs(data,opts)
+plotROI_ERPs(data,opts)
 
 switch opts.lockType
     case 'RT'
@@ -425,6 +425,7 @@ opts.ROInums    = [2];
 conditionBarPlotsWrapper (data, opts)
 %plotSubROI_ERPs(data,opts)
 
+
 %% Bar accross bands per ROI accross multiple bands
 
 addpath Plotting/
@@ -436,8 +437,9 @@ opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
-opts.bands           = {'delta','theta','alpha','beta','lgam','hgam'};
+opts.bands           = {'delta','theta','alpha'};
 opts.smoother       = 'loess';
+opts.smootherSpan   = 0.15;
 opts.yLimits        = [-6 1.5];
 opts.aRatio         = [50 300];
 
@@ -466,9 +468,16 @@ opts.aspectRatio = [600 300];
 opts.hem        = 1;
 
 opts.ROInums    = [1];
+plotROI_TC_multiband(opts)
+
+opts.ROInums    = [2];
+plotROI_TC_multiband(opts)
+
 opts.yLimits    = [-2.5 1];
 opts.yTicks     = [-2 -1 0];
 conditionBarMultiBandWrapper(opts)
+
+
 opts.ROInums    = [2];
 % opts.yLimits    = [-5.5 1];
 % opts.yTicks     = [-4 -2 0];
@@ -535,7 +544,7 @@ close all
 opts                = [];
 opts.hems            = 'l'; opts.hemNum=1;
 opts.ROIs           = [1 2];
-opts.lockType       = 'stim';
+opts.lockType       = 'RT';
 opts.type           = 'power';
 opts.band           = 'hgam';
 opts.dtype          = 'ZStat';
@@ -698,11 +707,11 @@ save([dataPath fileName],'S')
 addpath lib/
 
 opts                = [];
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.scoreType      = 'mBAC'; % RTsLogitCorr mBAC
 opts.accPlots       = false;
 opts.weigthsPlots   = false;
-opts.renderPlot     = true;
+opts.renderPlot     = false;
 opts.RTcorrPlots    = false;
 opts.stats          = true;
 opts.baseLineY      = 0;
@@ -712,7 +721,7 @@ opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.toolboxNum     = 1;
 %opts.dataType       = 'erp'; opts.bands          = {''};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'theta'};
+opts.dataType       = 'power'; opts.bands          = {'hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 

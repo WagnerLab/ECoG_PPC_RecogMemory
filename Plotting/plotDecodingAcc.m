@@ -29,7 +29,7 @@ mainPath    = '../Results/Plots/Classification/channel/';
 Y       = data.(opts.scoreType);
 Yp      = data.pBAC;
 Ysd     = data.sdBAC;
-threshold = 1e-4;
+threshold = 1e-3;
 switch opts.timeFeatures
     case 'trial'
         for hem = 1
@@ -248,11 +248,21 @@ switch opts.timeFeatures
                     fprintf('stats for roi %s ', data.ROIs{r})
                     chans   = data.ROIid.*(data.hemChanId == hem ) == r;
                     y{r}       = Y(chans);
-                    yp{r}       = Yp(chans);
+                    yp{r}      = Yp(chans)*2; % converting to two sided test
                     fprintf(' \n mean = %g \n' ,mean(y{r}))
                     fprintf('number of chans with p < %g  = %g \n' , threshold ,sum(yp{r} <threshold) )
-                    [~,p,~,t]=ttest(y{r},0.5,0.05,'right')
-                end
+                    [~,p,~,t]=ttest(y{r},0.5,0.05)
+                    
+                    % hard-coded for left subjects for now.
+                    fprintf('\n break down by subject \n')
+                    temp = cell(5,2);
+                    temp(1,:) = {'# p<0.001','total'};
+                    for ss= 1:4
+                        ch_s = chans&data.subjChans==ss;
+                        temp(ss+1,:) = {sum(Yp(ch_s)*2 < threshold), sum(ch_s)};
+                    end
+                    temp
+                end 
             end
         end
 end
