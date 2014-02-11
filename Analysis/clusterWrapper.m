@@ -11,27 +11,30 @@ X       =   data.(dtype)(chans,:);
 
 % smooth data
 if opts.smoothData
-    filtOrd     = 12;
+    filtOrd     = 10;
     movAvg      = 1/filtOrd*ones(1,filtOrd);
     X           = applyFilter(movAvg,X);
 end
 
 % settings for clustering:
 opts.method     = 'kmeans';
-opts.nClusters  = numel(opts.ROIs);
+%opts.nClusters  = numel(opts.ROIs);
 opts.nReplicates= 100;
 
 %% cluster
 out = clusterChannels(X,opts);
 CM  = confusionmat(data.ROIid(chans),out.index);
 
-if CM(1,1)+CM(2,2) <= CM(1,2)+CM(2,1);
-    temp = out.index;
-    out.index(temp==1) = 2;
-    out.index(temp==2) = 1;
-    out.D = [out.D(:,2) out.D(:,1)];
-    out.centers = [out.centers(2,:) ;out.centers(2,:)];
+if opts.nClusters ==2
+    if CM(1,1)+CM(2,2) <= CM(1,2)+CM(2,1);
+        temp = out.index;
+        out.index(temp==1) = 2;
+        out.index(temp==2) = 1;
+        out.D = [out.D(:,2) out.D(:,1)];
+        out.centers = [out.centers(2,:) ;out.centers(1,:)];
+    end
 end
+
 out.CM      = confusionmat(data.ROIid(chans),out.index);
 out.ROI_ids = data.ROIid(chans);
 
@@ -43,6 +46,10 @@ nDC     = 1-DC/max(DC(:)); out.nDC = nDC;
 out.CDB     = nDC-(nDC*nV')*nV; %cluster desicion boundary
 
 out.chans = chans;
+out.nClusters = opts.nClusters;
+
+out.CL_Nums = hist(out.index,out.nClusters);
+
 %% plot clusters
 if opts.plotting
     [f1 f2 f3] = plotClusters(data,out,chans,X);
@@ -58,18 +65,20 @@ if opts.plotting
     end
     
     if ~exist(plotPath,'dir'),mkdir(plotPath),end
-    filename = [plotPath '/' opts.hems dtype  'ClustererdChans' extStr];
-    print(f1,'-dtiff','-loose','-r500',filename);
+    if ~isempty(f1)
+        filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'ClustererdChans' extStr];
+        print(f1,'-dtiff','-loose','-r500',filename);
+    end
     %plot2svg([filename '.svg'],f1,'tiff')
-    
-    filename = [plotPath '/' opts.hems dtype  'RendClustererdChans' extStr];
-    print(f2,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
-    
+    if ~isempty(f2)
+        filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'RendClustererdChans' extStr];
+        print(f2,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
+    end
     figure(f3);
-    filename = [plotPath '/' opts.hems dtype  'ClustersTC' extStr];
+    filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'ClustersTC' extStr];
     if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
     print(f3,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
-    set(gca,'xticklabel',[],'yticklabel',[]);set(f3,'position',[200 200, opts.aRatio])    
+    set(gca,'xticklabel',[],'yticklabel',[]);set(f3,'position',[200 200, opts.aRatio])
     plot2svg([filename '.svg'],f3)
     
 end

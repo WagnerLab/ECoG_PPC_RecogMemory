@@ -16,7 +16,7 @@ end
 % cluster
 switch opts.method
     case 'kmeans'
-        [out.index,out.centers, ~, out.D] = kmeans(X,opts.nClusters,'replicates',opts.nReplicates);
+        [out.index,out.centers,out.sumd, out.D] = kmeans(X,opts.nClusters,'replicates',opts.nReplicates);
         % change coordinates of the distances to clusters to unity line
 
     case 'gm'

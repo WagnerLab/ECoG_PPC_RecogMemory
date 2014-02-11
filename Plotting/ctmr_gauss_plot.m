@@ -2,6 +2,16 @@ function ctmr_gauss_plot(axhandle,cortex,electrodes,weights,v,cm, limits)
 % function [electrodes]=ctmr_gauss_plot(cortex,electrodes,weights)
 % projects electrode locations onto their cortical spots in the 
 % left hemisphere and plots about them using a gaussian kernel
+%
+%
+% axhandle      = axis handle to plot
+% cortex        = struct of cortex
+% electrodes    = N x 3 electrodes coordinates
+% weights       = weight factor for each electrode
+% v             = left or right
+% cm            = colormap
+% limits        = limits of colormap
+%
 % for only cortex use: 
 % ctmr_gauss_plot(cortex,[0 0 0],0)
 % rel_dir=which('loc_plot');
@@ -24,7 +34,6 @@ function ctmr_gauss_plot(axhandle,cortex,electrodes,weights,v,cm, limits)
 %     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     
 %   Version 1.1.0, released 26-11-2009
-
 
 
 %load in colormap
