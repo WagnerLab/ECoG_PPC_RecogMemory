@@ -2,6 +2,7 @@
 
 function out = clusterWrapper(data, opts)
 % wrapper function for clustering channel data
+inkscapePath='/Applications/Inkscape.app/Contents/Resources/bin/inkscape';
 
 chans = ismember(data.ROIid,opts.ROIs) & ismember(data.hemChanId,opts.hemNum);
 
@@ -48,14 +49,25 @@ out.CDB     = nDC-(nDC*nV')*nV; %cluster desicion boundary
 out.chans = chans;
 out.nClusters = opts.nClusters;
 
+chansIds=find(chans);
+for jj = 1:out.nClusters
+    ClChans = chansIds(out.index==jj);
+    out.nSubjChansCl(jj,:) = hist(data.subjChans(ClChans),4);
+end
+
 out.CL_Nums = hist(out.index,out.nClusters);
 
+
+if opts.findSubCluster && (out.nClusters==2)
+        [out subF] = findSubClusters(data, out,opts);    
+end
 %% plot clusters
 if opts.plotting
-    [f1 f2 f3] = plotClusters(data,out,chans,X);
+    [clF] = plotClusters(data,out,chans,X);
     
     savePath        = opts.plotPath;
     extStr          = data.extension;
+    
     if strcmp(opts.type,'erp'),
         plotPath = [savePath 'group/Clusters/'];
     elseif strcmp(opts.type,'ITC')
@@ -65,22 +77,45 @@ if opts.plotting
     end
     
     if ~exist(plotPath,'dir'),mkdir(plotPath),end
-    if ~isempty(f1)
-        filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'ClustererdChans' extStr];
-        print(f1,'-dtiff','-loose','-r500',filename);
+    
+    filenameSuf = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters)];
+    
+    if ~isempty(clF(1))
+        filename = [filenameSuf 'ClustererdChans' extStr];
+        print(clF(1),'-dtiff','-loose','-r500',filename);
     end
     %plot2svg([filename '.svg'],f1,'tiff')
-    if ~isempty(f2)
-        filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'RendClustererdChans' extStr];
-        print(f2,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
+    if ~isempty(clF(2))
+        filename = [filenameSuf 'RendClustererdChans' extStr];
+        print(clF(2),'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
     end
-    figure(f3);
-    filename = [plotPath '/' opts.hems dtype 'K' num2str(out.nClusters) 'ClustersTC' extStr];
-    if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
-    print(f3,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
-    set(gca,'xticklabel',[],'yticklabel',[]);set(f3,'position',[200 200, opts.aRatio])
-    plot2svg([filename '.svg'],f3)
     
+    figure(clF(3));
+    filename = [filenameSuf 'ClustersTC' extStr];
+    if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
+    print(clF(3),'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
+    set(gca,'xticklabel',[],'yticklabel',[]);set(clF,'position',[200 200, opts.aRatio])
+    plot2svg([filename '.svg'],clF(3))
+    eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    
+    % sub-clusters
+    if opts.findSubCluster && (out.nClusters==2)
+        subSuclstersPlotNames = {'sub1','sub2','sub3', 'subsClDiffs','SubsClRender'};
+        
+        for jj = 1:4
+            figure(subF(jj));
+            filename = [filenameSuf subSuclstersPlotNames{jj} extStr];
+            if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
+            set(gcf,'position',[200 200, opts.aRatio])            
+            plot2svg([filename '.svg'],gcf)
+            eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+        end
+        
+        figure(subF(5))
+        filename = [filenameSuf subSuclstersPlotNames{5} extStr];
+        print(gcf,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
+        
+    end   
 end
 
 

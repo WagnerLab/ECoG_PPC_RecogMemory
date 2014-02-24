@@ -247,12 +247,15 @@ renderCortex(data,opts)
 
 %% calc ITC
 
+addpath Analysis/
+addpath lib/
+
 dateStr = '27-May-2013';
 subjects = {'16b','18','24','28'};
 dateStr = '17-Jun-2013';
 subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
-lockType = 'stim';
+lockType = 'RT';
 dataPath = '../Results/';
 
 for s = subjects
@@ -276,7 +279,7 @@ for bands = {'delta','theta','alpha'}
     
     opts            = [];
     opts.hems       = 'all';
-    opts.lockType   = 'stim';
+    opts.lockType   = 'RT';
     opts.reference  = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
     opts.type       = 'ITC';
     opts.band       = bands{1};
@@ -357,14 +360,14 @@ end
 
 opts                = [];
 opts.hems           = 'l';
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
-opts.band           = 'delta';
+opts.band           = 'hgam';
 opts.smoother       = 'loess';
-opts.smootherSpan   = 0.15;z
-opts.yLimits        = [-6 1.5];
+opts.smootherSpan   = 0.15;
+opts.yLimits        = [-0.5 1.5];
 opts.aRatio         = [500 300];
 
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
@@ -424,7 +427,6 @@ conditionBarPlotsWrapper (data, opts)
 opts.ROInums    = [2];
 conditionBarPlotsWrapper (data, opts)
 %plotSubROI_ERPs(data,opts)
-
 
 %% Bar accross bands per ROI accross multiple bands
 
@@ -493,16 +495,17 @@ opts                = [];
 opts.hems           = 'l';
 opts.lockType       = 'RT';
 opts.type           = 'power';
-opts.band           = 'theta';
+opts.band           = 'hgam';
 opts.comparisonType = 'BinZStat'; %{'BinTStat','BinpValT','BinpVal','BinZStat','BinpValz','BincondDiff'};
 opts.timeType       = 'Bins';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
-opts.renderType     = 'SmoothCh';%{'SmoothCh','UnSmoothCh', 'SigChans','SignChans'};
-opts.limitDw        = 1;
-opts.limitUp        = 5;
+opts.renderType     = 'UnSmoothCh2';%{'SmoothCh','UnSmoothCh', 'SigChans','SignChans'};
+opts.limitDw        = -4;
+opts.limitUp        = 4;
+opts.absLevel       = 1.5;
 opts.resolution     = 400;
-opts.avgBins        = [3:11];
+opts.avgBins        = [];
 
 opts.subjects       = {'16b','18','24','28','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
@@ -544,16 +547,19 @@ close all
 opts                = [];
 opts.hems            = 'l'; opts.hemNum=1;
 opts.ROIs           = [1 2];
-opts.lockType       = 'RT';
+opts.nClusters      = 2;
+opts.lockType       = 'stim';
 opts.type           = 'power';
-opts.band           = 'theta';
+opts.band           = 'hgam';
 opts.dtype          = 'ZStat';
 opts.smoothData     = true;
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
+opts.plotting       = true;
+opts.findSubCluster = true; % only wors for K=2
 opts.resolution     = 400;
 opts.aRatio         = [500 300];
-opts.plotting       = true;
+
 
 opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
@@ -590,13 +596,21 @@ fileName    = ['all' opts.preFix 'Group' opts.extension '.mat'];
 load([opts.dataPath fileName])
 out=clusterWrapper(data, opts);
 
+fileName2 = ['K' num2str(opts.nClusters) 'Clusters' fileName];
+opts.savePath = [opts.dataPath 'clusters/'];
+if ~exist(opts.savePath,'dir'), mkdir(opts.savePath),end
+
+save([opts.savePath fileName2],'out')
+
+
 %% output group data to a csv file
 
 addpath Analysis/
+clc
 
 opts                = [];
 opts.hems           = 'all';
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.type           = 'power'; opts.band = 'hgam';
 %opts.type           = 'power'; opts.band = 'hgam';
@@ -608,8 +622,8 @@ switch opts.lockType
         opts.time   = [-0.6 0.1];
         timeStr     = 'n600msTo100ms';
     case 'stim'
-        opts.time   = [0 0.9];
-        timeStr     = '0msTo900ms';
+        opts.time   = [0 1];
+        timeStr     = '0msTo1000ms';
 end
 
 
@@ -641,13 +655,14 @@ csvwrite([savePath opts.bin timeStr fileName blockStr '.csv'],single(out));
 %% decoding
 
 addpath Classification/
+addpath lib/
 
 opts                = [];
 opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 %opts.dataType       = 'erp'; opts.bands          = {''};
-opts.dataType       = 'power'; opts.bands          = {'beta'};
-%opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
+%opts.dataType       = 'power'; opts.bands          = {'hgam'};
+opts.dataType       = 'power'; opts.bands          = {'erp','delta','theta','alpha','beta','lgam','hgam'};
 opts.toolboxNum     = 1;
 
 % feauture settings
@@ -658,7 +673,7 @@ opts.timeType       = 'Bin';
 % channelGroupingType makes the distinction between decoding between channels, rois or
 % all channels within LPC
 % options are {'channel','ROI','all'};
-opts.channelGroupingType      = 'channel';
+opts.channelGroupingType      = 'all';
 % timeFeatures distinguishes between taking the whole trial or taking a
 % window of time
 % options are {'window','trial'};
@@ -707,21 +722,21 @@ save([dataPath fileName],'S')
 addpath lib/
 
 opts                = [];
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.scoreType      = 'mBAC'; % RTsLogitCorr mBAC
 opts.accPlots       = false;
 opts.weigthsPlots   = false;
-opts.renderPlot     = true;
+opts.renderPlot     = false;
 opts.RTcorrPlots    = false;
-opts.stats          = false;
+opts.stats          = true;
 opts.baseLineY      = 0;
 opts.rendLimits     = [-0.25 0.25];
 opts.resolution     = 400;
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.toolboxNum     = 1;
-%opts.dataType       = 'erp'; opts.bands          = {''};
+opts.dataType       = 'power'; opts.bands          = {'hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'theta'};
+%opts.dataType       = 'power'; opts.bands          = {'theta'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 
 

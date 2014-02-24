@@ -1,6 +1,6 @@
 
 
-function [f1 f2 f3] = plotClusters(data,out,chans,X)
+function [f] = plotClusters(data,out,chans,X)
 
 % a bit hard-coded right now, need to clean up this code. Nov 25, 2013
 
@@ -18,7 +18,7 @@ gp2col = [0.1 0.5 0.8];
 
 %% scatter plot of channel distances to clusters (normalized)
 if out.nClusters==2
-    f1 = figure(1); clf; hold on;
+    f(1) = figure; clf; hold on;
     set(gcf,'PaperPositionMode','auto','position',[100 100 600 600])
     % plot limits
     xlim([0 1]); ylim([0 1])
@@ -42,12 +42,12 @@ if out.nClusters==2
     set(h3,'linewidth',2,'linestyle','--','color','k')
     set(gca, 'linewidth',4,'xtick',0:0.2:1,'ytick',0:0.2:1,'fontsize',14)
 else
-    f1=[];
+    f(1)=[];
 end
 %% rendering of the clusters
 
-f2 = figure(2); clf;
-set(f2,'Position',[200 200 800 800]);
+f(2) = figure; clf;
+set(f(2),'Position',[200 200 800 800]);
 tight_subplot(1,1,0.001,0.001,0.001);
 temp = load('../Results/ERP_Data/group/allERPsGroupstimLocksubAmpnonLPCleasL1TvalCh10.mat');
 chanLocs    =  temp.data.MNILocs;
@@ -99,8 +99,8 @@ end
 loc_view(view{1}(1),view{1}(2))
 
 %% time courses
-f3=figure(3); clf; hold on;
-set(f3,'position',[200 200,500,300],'PaperPositionMode','auto')
+f(3)=figure; clf; hold on;
+set(f(3),'position',[200 200,500,300],'PaperPositionMode','auto')
 
 Y = cell(out.nClusters,1);
 for ii = 1:out.nClusters

@@ -176,7 +176,7 @@ for s = 1:nSubjs
                     S.out{s,chanIter,winIter,bs}.Y  = S_in.Y;
                     S.perf(s,chanIter,winIter,bs)   = calcBAC(1,0,S_in.Y ==1,S.out{s,chanIter,winIter,bs}.predictions==1);
                     
-                    if ~strcmp(S.classificationParams.toolbox,'NNDTW')
+                    if strcmp(S.classificationParams.toolbox,'liblinear') || strcmp(S.classificationParams.toolbox,'glmnet')
                         if nFeatures > 1
                             %mean_model(bs,:) = median(zscore(S.out{s,chanIter,winIter,bs}.weights(:,1:nFeatures),[],2));
                             mean_model(bs,:) = median(S.out{s,chanIter,winIter,bs}.weights);
@@ -188,7 +188,7 @@ for s = 1:nSubjs
                         S.perfMISS(s,chanIter,winIter,bs) = sum((Y2==0) & ([X2 ones(nFA+nMI,1)]*mean_model(bs,:)'< 0) )/nMI;
                     end
                 end
-                if ~strcmp(S.classificationParams.toolbox,'NNDTW')
+                if strcmp(S.classificationParams.toolbox,'liblinear') || strcmp(S.classificationParams.toolbox,'glmnet')
                     S.model{s,chanIter,winIter} = median(mean_model(:,1:nFeatures));
                 end
             else

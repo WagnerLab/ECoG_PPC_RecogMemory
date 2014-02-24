@@ -29,7 +29,7 @@ function opts = getClassifierOpts(toolbox)
 opts = [];
 switch toolbox
     case 'liblinear'
-        addpath ..lib/liblinear-1.93/matlab/
+        addpath lib/liblinear-1.93/
         opts.CParamSet      = 10.^(-4:0.5:3);%2.^(-10:2:10); % parameter search space
         opts.EParamSet      = [0.01 1 100];%2.^(-10:2:10); % parameter search space
         opts.paramFolds     = 4; % # folds for CV on parameter selection
@@ -38,10 +38,11 @@ switch toolbox
         opts.trainOpts      = ['-q -s ' opts.solver_type ' -B 1']; % training options
         opts.predictOpts    = '-b 1'; % test options
     case 'libsvm'
-        addpath ..lib/libsvm-3.11/matlab/
+        addpath lib/libsvm-3.11/
         opts.Param1Set      = 2.^(-5:3:12); % C param set
         opts.Param2Set      = 2.^(3:-3:-12); % gamma set
         opts.solver_type    = '01'; % first digit is the solver, second is the kernel
+        opts.solverStr      = [toolbox 'S' opts.solver_type];
         opts.paramFolds     = 2; % xval for parameter selection
         opts.predictOpts    = [];
         opts.trainOpts      = ['-q -s ' num2str(opts.solver_type(1)) ' -t ' ...
@@ -50,12 +51,12 @@ switch toolbox
         if strcmp(opts.solver_type(2),'1')
             opts.trainOpts = [opts.trainOpts ' -d 2 '];
         end        
-        opts.trainOpts = [opts.trainOpts '-c '];                    
+        opts.trainOpts = [opts.trainOpts '-c '];
     case 'glmnet'
-        addpath ../lib/glmnet_matlab
+        addpath lib/glmnet_matlab
         opts                = glmnetSet; % glmnet
-        opts.alpha          = 1; % L2-L1 parameter
-        opts.lambda         = 10.^(-8:0.3:0);
+        opts.alpha          = 0.8; % L2-L1 parameter
+        opts.lambda         = 10.^(-8:0);
         opts.maxit          = 20; % max number of iterations
         opts.thresh         = 0.01;
         opts.standardize    = false;
@@ -68,7 +69,7 @@ switch toolbox
         opts.Kparam         = 1; % number of nearest neighbors        
         opts.maxDistParam   = 20; % maxium distorition allowed on DTW, (w param)
         
-        opts.filterData     = true;
+        opts.filterData     = false;
         
         if opts.filterData
             % assumption that sampling rate is *436*
