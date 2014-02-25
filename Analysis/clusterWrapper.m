@@ -1,5 +1,3 @@
-
-
 function out = clusterWrapper(data, opts)
 % wrapper function for clustering channel data
 inkscapePath='/Applications/Inkscape.app/Contents/Resources/bin/inkscape';

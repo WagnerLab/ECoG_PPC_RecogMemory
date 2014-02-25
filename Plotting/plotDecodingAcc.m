@@ -224,19 +224,25 @@ switch opts.timeFeatures
             %% rendering
             
             if opts.renderPlot
-                chans   = data.hemChanId == hem ;
-                
+                chans   = data.hemChanId == hem ;                
                 limits = opts.rendLimits-opts.baseLineY;
+                opts.limitDw = limits(1);
+                opts.limitUp = limits(2);
+                opts.absLevel = 0.03;
+                opts.renderType = 'UnSmoothChThr';
+                opts.hem        = hem_str{hem};
+                
                 h=figure(1);clf;
                 set(h,'Position',[200 200 800 800]);
                 ha = tight_subplot(1,1,0.001,0.001,0.001);
-                ctmr_gauss_plot(gca,cortex{hem},chanLocs(chans,:),Y(chans)-0.5,hem_str{hem},clmap);
-                el_add(chanLocs(chans,:),'k',10);
+                %ctmr_gauss_plot2(gca,cortex{hem},chanLocs(chans,:),Y(chans)-0.5,hem_str{hem},clmap);
+                plotSurfaceChanWeights(ha, cortex{hem}, chanLocs(chans,:), Y(chans)-0.5,opts)
+                %el_add(chanLocs(chans,:),'k',10);
                 loc_view(view{hem}(1),view{hem}(2))
                 set(gca,'clim',limits);
                 %colorbar;
                 savePath    = [mainPath opts.dataType '/' opts.lockType '/'];
-                fileName = [hem_str{hem} 'rendROIchan_ACC' opts.scoreType opts.fileName];
+                fileName = [hem_str{hem} 'rendROIchan_ACC' opts.scoreType opts.renderType opts.fileName];
                 print(h,'-dtiff',['-r' num2str(opts.resolution)],[savePath fileName])
             end
             
