@@ -92,5 +92,5 @@ elseif (min(x) < -max(x)) && ( max(x) > 0)
 elseif (min(x) < -max(x))
     set(gca,'YTick',[min(x) min(x)/2 0])
 end
-set(gca,'yTickLabel',get(gca,'yTick'));
+%set(gca,'yTickLabel',get(gca,'yTick'));
 hold off;

@@ -12,10 +12,10 @@ switch type
         Colors = [;
             0.1 0 1;
             0 1 1;
-            0 1 0.7;
+            %0 1 0.7;
             0.7 0.7 0.7;
             0.7 0.7 0.7;
-            0.7 1 0;
+            %0.7 1 0;
             1 1 0;
             1 0 0.1;];
         nLevels     = size(Colors,1)/2;
@@ -61,11 +61,11 @@ switch type
         absLimit    = opts.absLevel;
         
         Colors = [;
-            0.1 0 1;
-            0 1 1;
-            1 1 1;
-            1 1 1;
-            1 0.7 0;
+            0 0 1;
+            0 0.5 1;
+            0.8 0.8 1;
+            1 0.8 0.8;
+            1 0.5 0;
             1 0 0;];
         nLevels     = size(Colors,1)/2;
         levels      = [linspace(-limitUp,-limitDw,nLevels),linspace(limitDw,limitUp,nLevels)];

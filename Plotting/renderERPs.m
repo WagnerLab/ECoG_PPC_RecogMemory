@@ -4,8 +4,8 @@ function renderERPs(data,opts)
 %   cMapGenerate
 %   rendering scripts
 
-hem         = opts.hems;
-hemChans    = ismember(data.subjChans,find(strcmp(opts.hemId,opts.hems)))';
+hem         = opts.hem;
+hemChans    = ismember(data.subjChans,find(strcmp(opts.hemId,hem)))';
 chanCoords  = data.MNILocs(hemChans,:);
 nChans      = size(chanCoords,1);
 
@@ -60,7 +60,7 @@ for bi = 1:nBins
             el_add(chanCoords(negChans,:),[0.2 0.2 0.9],20);
         
         otherwise
-           plotSurfaceChanWeights(handle, cortex, chanCoords, binStat,opts)
+           plotSurfaceChanWeights(gca, cortex, chanCoords, binStat,opts)
     end
     loc_view(view.(hem)(1),view.(hem)(2))
     set(gca,'clim',[-limitUp limitUp])

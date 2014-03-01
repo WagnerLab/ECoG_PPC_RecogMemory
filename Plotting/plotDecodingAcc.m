@@ -229,7 +229,7 @@ switch opts.timeFeatures
                 opts.limitDw = limits(1);
                 opts.limitUp = limits(2);
                 opts.absLevel = 0.03;
-                opts.renderType = 'UnSmoothChThr';
+                opts.renderType = 'SmoothCh';
                 opts.hem        = hem_str{hem};
                 
                 h=figure(1);clf;
