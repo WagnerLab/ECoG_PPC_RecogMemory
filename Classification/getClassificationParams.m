@@ -3,7 +3,7 @@ function params = getClassificationParams(tooboxNum)
 % script to set classification parameters
 
 params = [];
-params.nFolds               = 20; % number of XVal folds
+params.nFolds               = 10; % number of XVal folds
 ClassificationToolboxes     = {'liblinear','libsvm','glmnet','NNDTW'};
 params.toolbox              = ClassificationToolboxes{tooboxNum};
 params.options              = getClassifierOpts(params.toolbox);
@@ -21,7 +21,7 @@ if strcmp(params.featSelect,'pca')
 end
 if strcmp(params.bootStrapData,'boot')
     params.nBoots       = 100; % number of bootstrap iterations
-    params.PctTrials    = 0.8;  % percentage of trials to be included in each bootstrap sample
+    params.PctTrials    = 0.99;  % percentage of trials to be included in each bootstrap sample
 end
 
 function opts = getClassifierOpts(toolbox)
@@ -30,9 +30,9 @@ opts = [];
 switch toolbox
     case 'liblinear'
         addpath lib/liblinear-1.93/
-        opts.CParamSet      = 10.^(-4:0.5:3);%2.^(-10:2:10); % parameter search space
+        opts.CParamSet      = 0.01;%10.^(-4:0.5:3);%2.^(-10:2:10); % parameter search space
         opts.EParamSet      = [0.01 1 100];%2.^(-10:2:10); % parameter search space
-        opts.paramFolds     = 4; % # folds for CV on parameter selection
+        opts.paramFolds     = 5; % # folds for CV on parameter selection
         opts.solver_type    = '0'; % solver for liblinear
         opts.solverStr      = [toolbox 'S' opts.solver_type];
         opts.trainOpts      = ['-q -s ' opts.solver_type ' -B 1']; % training options

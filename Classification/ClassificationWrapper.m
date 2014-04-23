@@ -65,7 +65,7 @@ switch opts.timeFeatures
     case 'trial'
         nWin            =  1;
         if strcmp(opts.timeType,'Bin')
-            WinSamps    = true(1,data.nBins);
+            WinSamps    = (data.Bins(:,1)>=opts.timeLims(1) & data.Bins(:,2)<=opts.timeLims(2))';
         else
             WinSamps    = true(1,data.nTrialSamps);
         end
@@ -83,8 +83,10 @@ switch opts.channelGroupingType
         for s = 1:nSubjs
             nChansSubjIter(s) = numel(unique(data.ROIid(data.subjChans==s)));
         end
+    case 'IPS-SPL'
+        nChansSubjIter = ones(nSubjs,1);  
     case 'all'
-        nChansSubjIter = ones(nSubjs,1);
+        nChansSubjIter = ones(nSubjs,1);  
     otherwise
         error('not supported option for channel features')
 end
@@ -133,9 +135,11 @@ for s = 1:nSubjs
     nSubsetTrials   = 2*round(nSubsetTrials/2);
     
     S.trials{s}     = trials;
-    S.Y{s}          = Y;
-    S.BootIdxMat{s} = balancedBootStrapIdx(nBoots,nSubsetTrials,nFolds,find(Y==1),find(Y==0));
-    
+    S.sY{s}          = Y;
+    %S.BootIdxMat{s} = balancedBootStrapIdx(nBoots,nSubsetTrials,nFolds,find(Y==1),find(Y==0));
+    [S.testIdx{s}, S.testFoldIdx{s}, S.trainFoldIdx{s}]  = balancedBootStrapXVal(nBoots, ...
+        nSubsetTrials,nFolds,find(Y==1),find(Y==0));
+
     for chanIter = 1:nChansSubjIter(s)
         
         fprintf( 'Classifying Subject %d Channel %d \n',s,chanIter)
@@ -146,6 +150,8 @@ for s = 1:nSubjs
                 chIdx = chanIter;
             case 'ROI'
                 chIdx = find(data.ROIid(data.subjChans==s)==chanIter);
+            case 'IPS-SPL'
+                chIdx = find(data.ROIid(data.subjChans==s)==1|data.ROIid(data.subjChans==s)==2);
             case 'all'
                 chIdx = 1:data.nSubjLPCchans(s);
         end
@@ -163,25 +169,32 @@ for s = 1:nSubjs
             assert(nTrials   == size(X,1) ,'number of trials did not match');
             assert(nFeatures == size(X,2) ,'number of features did not match');
             
+            S.X = X;
+            S.Y = Y;
+            
             % classify
             if strcmp( S.classificationParams.bootStrapData,'boot')
                 mean_model = nan(nBoots,nFeatures+1);
                 %if s==2 && chanIter == 1; keyboard; end;
                 for bs = 1:nBoots;
                     S_in         = S;
-                    S_in.X       = X(S.BootIdxMat{s}(:,bs),:);
-                    S_in.Y       = Y(S.BootIdxMat{s}(:,bs));
+                    
+                    S_in.BootTestIdx  = S.testIdx{s}(:,bs);
+                    S_in.BootTestFoldIdx  = S.testFoldIdx{s}(:,:,bs);
+                    S_in.BootTrainFoldIdx = S.trainFoldIdx{s}(:,:,bs);
+                    %S_in.X       = X(S.BootIdxMat{s}(:,bs),:);
+                    %S_in.Y       = Y(S.BootIdxMat{s}(:,bs));
                     
                     S.out{s,chanIter,winIter,bs}    = ECoGClassify(S_in);
-                    S.out{s,chanIter,winIter,bs}.Y  = S_in.Y;
-                    S.perf(s,chanIter,winIter,bs)   = calcBAC(1,0,S_in.Y ==1,S.out{s,chanIter,winIter,bs}.predictions==1);
+                    S.out{s,chanIter,winIter,bs}.Y  = Y(S_in.BootTestIdx);
+                    S.perf(s,chanIter,winIter,bs)   = calcBAC(1,0,Y(S_in.BootTestIdx)==1,S.out{s,chanIter,winIter,bs}.predictions==1);
                     
                     if strcmp(S.classificationParams.toolbox,'liblinear') || strcmp(S.classificationParams.toolbox,'glmnet')
                         if nFeatures > 1
                             %mean_model(bs,:) = median(zscore(S.out{s,chanIter,winIter,bs}.weights(:,1:nFeatures),[],2));
-                            mean_model(bs,:) = median(S.out{s,chanIter,winIter,bs}.weights);
+                            mean_model(bs,:) = mean(S.out{s,chanIter,winIter,bs}.weights);
                         else
-                            mean_model(bs,:) = median(S.out{s,chanIter,winIter,bs}.weights);
+                            mean_model(bs,:) = mean(S.out{s,chanIter,winIter,bs}.weights);
                         end
                         
                         S.perfFA(s,chanIter,winIter,bs)   = sum((Y2==1) & ([X2 ones(nFA+nMI,1)]*mean_model(bs,:)'>=0) )/nFA;

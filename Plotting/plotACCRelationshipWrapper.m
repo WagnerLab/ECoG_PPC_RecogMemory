@@ -51,7 +51,7 @@ M2(:,2) = data2.sdBAC(chans)/sqrt(nBoot2-1);
 
 % plot M1 vs M2
 figure(1); clf;
-ha = tight_subplot(2,2,[0.01 0.01], 0.01, 0.01); 
+ha = tight_subplot(2,2,[0.01 0.01], 0.05, 0.05); 
 set(gcf,'PaperPositionMode','auto','position',[100 100 800 800])
 set(ha(3),'visible','off');
 
@@ -82,8 +82,9 @@ if opts.ROIids
         cnt = cnt + nChanPerROI(r);
     end
     plot([0.5 0.5],ylim,'--k','linewidth',2)
-    set(gca,'LineWidth',2,'FontSize',16)
-    set(gca,'xtick',ticks,'xtickLabel','','ytick',[])
+    set(gca,'LineWidth',2,'FontSize',20, 'fontWeight','bold')
+    set(gca,'xtick',ticks,'xtickLabel',ticks,'ytick',[])
+    %set(gca,'xtick',ticks,'ytick',[])
     %axis square
     %print(gcf,'-depsc2',[opts.savePath '/' plotName1])
     
@@ -107,8 +108,8 @@ if opts.ROIids
         cnt = cnt + nChanPerROI(r);
     end
     plot(xlim,[0.5 0.5],'--k','linewidth',2)
-    set(gca,'LineWidth',2,'FontSize',16)
-    set(gca,'ytick',ticks,'ytickLabel','','xtick',[])
+    set(gca,'LineWidth',2,'FontSize',20,'fontWeight','bold')
+    set(gca,'ytick',ticks,'ytickLabel',ticks,'xtick',[])
     %axis square
    % print(gcf,'-depsc2',[opts.savePath '/' plotName2])
     

@@ -1,4 +1,4 @@
-function ha = barPlotWithErrors(M,opts)
+function barPlotWithErrors(ha,M,opts)
 % ha = barPlotWithErrors(M)
 %
 % M -> cell array with the data. Each cell entry becomes a column in the
@@ -9,6 +9,8 @@ function ha = barPlotWithErrors(M,opts)
 %   baseLine
 %   yLimits 
 %   xPositions
+
+axes(ha); hold on;
 
 nBars   = size(M,1);
 m       = zeros(nBars,1);
@@ -29,16 +31,15 @@ end
 if ~isfield(opts,'xPositions')
     opts.xPositions = 1:nBars;
 end
-ha=figure(); clf;hold on;
-set(gcf,'paperpositionmode','auto','position',[100 100 opts.aspectRatio])
 
 for ba = 1:nBars
     
     X = M{ba};
-    n = size(X,1);
-    [m(ba) se(ba)] = grpstats(X,ones(n,1),{'mean','sem'});
+    n = sum(~isnan(X));
+    m(ba)   = nanmean(X);
+    se(ba)  = nanstd(X)/sqrt(n-1);
         
-    bar(opts.xPositions(ba),m(ba),0.95,'FaceColor',opts.colors(ba,:),'edgeColor', 'none', 'basevalue',opts.baseLine,'ShowBaseLine','off')
+    bar(opts.xPositions(ba),m(ba),0.90,'FaceColor',opts.colors(ba,:),'edgeColor', 'none', 'basevalue',opts.baseLine,'ShowBaseLine','off')
     plot([1 1]*opts.xPositions(ba), [-se(ba) se(ba)]+m(ba), 'color',[0 0 0],'linewidth',4)
     
 end    
@@ -69,5 +70,5 @@ else
 end
 
 
-set(gca,'LineWidth',2,'FontSize',14,'XTickLabel','')
+set(gca,'LineWidth',2,'FontSize',18,'XTickLabel','')
 

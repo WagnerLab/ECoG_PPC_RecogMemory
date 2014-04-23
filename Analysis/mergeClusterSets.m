@@ -1,5 +1,6 @@
 % additional analysis that loads stim and RT lock level clusters to
 % understand the relationship between these.
+inkscapePath='/Applications/Inkscape.app/Contents/Resources/bin/inkscape';
 
 cd ~/Documents/ECOG/scripts/
 dataPath= '../Results/Spectral_Data/group/';
@@ -44,7 +45,9 @@ figure();clf; hold on;
 set(gcf,'position',[200 200,500,300],'PaperPositionMode','auto')
 plotNTraces(X,data1.data.trialTime,'yl','loess',0.15);
 
-for jj=1:3
+cPath = pwd;
+savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/individualPlotsPDFs/stimHGPcluster/';
+for jj=1:2
     X       = cell(2,1);
     X{1} = data1.data.mHits(UsubCl{jj},:);
     X{2} = data1.data.mCRs (UsubCl{jj},:);
@@ -53,6 +56,15 @@ for jj=1:3
     set(gcf,'position',[200 200,500,300],'PaperPositionMode','auto');
     plotNTraces(X,data1.data.trialTime,'oc','loess',0.15)
     
+    
+    cd(savePath)
+    addpath(cPath)
+    addpath([cPath '/Plotting/'])
+
+    filename = ['stimHGPmergedSub-Clusters' num2str(jj)];
+    plot2svg([filename '.svg'],gcf)
+    eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    cd(cPath)
 end
 
 %%
@@ -65,7 +77,8 @@ figure();clf; hold on;
 set(gcf,'position',[200 200,500,300],'PaperPositionMode','auto')
 plotNTraces(X,data2.data.trialTime,'yl','loess',0.15);
 
-for jj=1:3
+savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/individualPlotsPDFs/rtHGPcluster/';
+for jj=1:2
     X       = cell(2,1);
     X{1} = data2.data.mHits(UsubCl{jj},:);
     X{2} = data2.data.mCRs (UsubCl{jj},:);
@@ -73,7 +86,16 @@ for jj=1:3
     figure();clf; hold on;
     set(gcf,'position',[200 200,500,300],'PaperPositionMode','auto');
     plotNTraces(X,data2.data.trialTime,'oc','loess',0.15)
+    set(gca,'yaxis','right')
+     
+    cd(savePath)
+    addpath(cPath)
+    addpath([cPath '/Plotting/'])
     
+    filename = ['rtHGPmergedSub-Clusters' num2str(jj)];
+    plot2svg([filename '.svg'],gcf)
+    eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    cd(cPath)
 end
 
 %% render union
@@ -102,5 +124,8 @@ for ii = 1:2
 end
 loc_view(view{1}(1),view{1}(2))
 
+savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/individualPlotsPDFs/';
+filename = [savePath 'HGPmergedSub-Clusters'];
+print(f,'-dtiff',['-r400'],filename)
 
 

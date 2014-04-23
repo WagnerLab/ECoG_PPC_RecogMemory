@@ -1,8 +1,6 @@
-
-
 function [f] = plotClusters(data,out,chans,X)
 
-% a bit hard-coded right now, need to clean up this code. Nov 25, 2013
+% a bit hard-coded right now, need to clean up this code. 
 
 nDC    = out.nDC;
 CDB    = out.CDB;

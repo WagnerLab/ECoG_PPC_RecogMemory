@@ -42,7 +42,13 @@ DC      = out.D;
 nCl     = size(DC,2); % number of clusters
 nV      = 1/sqrt(nCl)*ones(1,nCl);
 nDC     = 1-DC/max(DC(:)); out.nDC = nDC;
-out.CDB     = nDC-(nDC*nV')*nV; %cluster desicion boundary
+
+%cluster desicion boundary
+% for n=2
+%out.CDB = (nDC(:,1)-nDC(:,2))/sqrt(2); 
+
+temp    = nDC-(nDC*nV')*nV; 
+out.CDB = sign(temp(:,1)).*sqrt(sum(temp.^2,2));
 
 out.chans = chans;
 out.nClusters = opts.nClusters;
@@ -57,7 +63,7 @@ out.CL_Nums = hist(out.index,out.nClusters);
 
 
 if opts.findSubCluster && (out.nClusters==2)
-        [out subF] = findSubClusters(data, out,opts);    
+    [out subF] = findSubClusters(data, out,opts);
 end
 %% plot clusters
 if opts.plotting
@@ -80,7 +86,7 @@ if opts.plotting
     
     if ~isempty(clF(1))
         filename = [filenameSuf 'ClustererdChans' extStr];
-        print(clF(1),'-dtiff','-loose','-r500',filename);
+        print(clF(1),'-dtiff','-loose','-r300',filename);
     end
     %plot2svg([filename '.svg'],f1,'tiff')
     if ~isempty(clF(2))
@@ -92,7 +98,8 @@ if opts.plotting
     filename = [filenameSuf 'ClustersTC' extStr];
     if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
     print(clF(3),'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
-    set(gca,'xticklabel',[],'yticklabel',[]);set(clF,'position',[200 200, opts.aRatio])
+    %set(gca,'xticklabel',[],'yticklabel',[]);
+    set(clF,'position',[200 200, opts.aRatio])
     plot2svg([filename '.svg'],clF(3))
     eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
     
@@ -104,7 +111,7 @@ if opts.plotting
             figure(subF(jj));
             filename = [filenameSuf subSuclstersPlotNames{jj} extStr];
             if strcmp(opts.lockType,'RT'),set(gca,'YAXisLocation','right'),end
-            set(gcf,'position',[200 200, opts.aRatio])            
+            set(gcf,'position',[200 200, opts.aRatio])
             plot2svg([filename '.svg'],gcf)
             eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
         end
@@ -113,7 +120,7 @@ if opts.plotting
         filename = [filenameSuf subSuclstersPlotNames{5} extStr];
         print(gcf,'-dtiff','-loose',['-r' num2str(opts.resolution)],filename);
         
-    end   
+    end
 end
 
 

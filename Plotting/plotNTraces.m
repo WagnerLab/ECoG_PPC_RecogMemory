@@ -7,7 +7,7 @@ function h = plotNTraces(X,t,cols,smoother,smootherSpan,centerType, yLimits)
 % 2nd dim = time
 % t = time units
 % colors for each trace
-% smoother: {'loess','lowess','moving'}
+% smoother: {'loess','lowess','moving','none'}
 % smootherSpan: 0-1 for loess, nsamps for moving
 % centerType indicates if it should use the mean or the median
 
@@ -38,12 +38,14 @@ for i = 1:N
     colors(i,:) = eval(cols(i));
     x = X{i};
     
-    me(i,:)  = eval([centerType '(x)']);
+    me(i,:)  = eval(['nan' centerType '(x)']);
     n(i)    = size(x,1);
-    se(i,:) = std(x)/sqrt(n(i)-1);
+    se(i,:) = nanstd(x)/sqrt(n(i)-1);
     if exist('smoother','var')
-        me(i,:)  = smooth(me(i,:),smootherSpan,smoother);
-        se(i,:) = smooth(se(i,:),smootherSpan,smoother);
+        if ~strcmp(smoother,'none')
+            me(i,:)  = smooth(me(i,:),smootherSpan,smoother);
+            se(i,:) = smooth(se(i,:),smootherSpan,smoother);
+        end
     end
 end
 

@@ -1,6 +1,8 @@
 function printStats(data,opts)
 % main statistics from time courses
 
+ROIs        = {'IPS','SPL','AG'};
+
 % number of tests
 mMain           = 1;
 mInter          = 1*3;
@@ -11,76 +13,67 @@ INTER_alpha     = 0.05/mInter;
 % time bins of interest
 BOT         = find((data.Bins(:,1) >= opts.time(1)) & (data.Bins(:,2) <= opts.time(2)));
 
-LhemChans   = data.hemChanId==1;
-LIPSch      = data.ROIid.*LhemChans ==1;
-LSPLch      = data.ROIid.*LhemChans ==2;
-LAGch       = data.ROIid.*LhemChans ==3;
-
-RhemChans   = data.hemChanId==2;
-RIPSch      = data.ROIid.*RhemChans ==1;
-RSPLch      = data.ROIid.*RhemChans ==2;
-RAGch       = data.ROIid.*RhemChans ==3;
-
-switch type, 
-    case 'Bin' 
-        time = data.Bins(BOT,:);
-    case 'BigBin' 
-        time = data.BigBins; 
+hemChans        = [data.hemChanId==1 data.hemChanId==2];
+hemROIChans     = cell(2,3);
+for ii=1:2;
+    for jj=1:3
+        hemROIChans{ii,jj}   = data.ROIid.*hemChans(:,ii) == ii;
+    end
 end
 
-%%
-display('Lefts')
-% IPS
-display('IPS t test results')
-Y1 = data.([type 'ZStat'])(LIPSch,BOT);
-ttestPrint(Y1,MAIN_alpha,time)
-% SPL
-display('SPL t test results')
-Y2 = data.([type 'ZStat'])(LSPLch,BOT);
-ttestPrint(Y2,MAIN_alpha,time)
-% AG
-display('AG t test results')
-Y3 = data.([type 'ZStat'])(LAGch,BOT);
-ttestPrint(Y3,MAIN_alpha,time)
+SubjROIChans      = cell(3,7);
+for ii = 1:3
+    for jj=1:7;
+        SubjROIChans{ii,jj} = data.ROIid.*(data.subjChans'==jj) == ii;
+    end
+end
 
-% AG-SPL interaction
-display('AG-IPS 2 sample t test results')
-ttest2Print(Y3,Y1,INTER_alpha,time)
+switch type,
+    case 'Bin'
+        time = data.Bins(BOT,:);
+    case 'BigBin'
+        time = data.BigBins;
+end
 
-% IPS-SPL interaction
-display('AG-SPL 2 sample t test results')
-ttest2Print(Y3,Y2,INTER_alpha,time)
+%% main
 
-% IPS-SPL interaction
-display('IPS-SPL 2 sample t test results')
-ttest2Print(Y1,Y2,INTER_alpha,time)
+hems = {'Lefts', 'Rights'};
+for kk = 1:2
+    display(hems{kk})
+    ChanMat = cell(3,1);
+    % main across channels effects
+    for ii = 1:3
+        display([ROIs{ii} ' t test results'])
+        ChanMat{ii} = data.([type 'ZStat'])(hemROIChans{kk,ii},BOT);
+        ttestPrint(ChanMat{ii},MAIN_alpha,time)
+    end
+    % roi interactions
+    for ii = 1:2
+        for jj = ii+1:3
+            display([ROIs{ii} '-' ROIs{jj} ' 2 sample t test results'])
+            ttest2Print(ChanMat{ii},ChanMat{jj},INTER_alpha,time)
+        end
+    end
+end
 
-%%
-display('Rights')
-% IPS
-display('IPS t test results')
-Y1 = data.([type 'ZStat'])(RIPSch,BOT);
-ttestPrint(Y1,MAIN_alpha,time)
-% SPL
-display('SPL t test results')
-Y2 = data.([type 'ZStat'])(RSPLch,BOT);
-ttestPrint(Y2,MAIN_alpha,time)
-% AG
-display('AG t test results')
-Y3 = data.([type 'ZStat'])(RAGch,BOT);
-ttestPrint(Y3,MAIN_alpha,time)
-
-% AG-SPL interaction
-display('AG-IPS 2 sample t test results')
-ttest2Print(Y3,Y1,INTER_alpha,time)
-
-% IPS-SPL interaction
-display('AG-SPL 2 sample t test results')
-ttest2Print(Y3,Y2,INTER_alpha,time)
-
-% IPS-SPL interaction
-display('IPS-SPL 2 sample t test results')
-ttest2Print(Y1,Y2,INTER_alpha,time)
+fprintf('\n\n')
+% across subjects
+SubjMat = cell(3);
+for ii = 1:3
+    for jj = 1:7
+        SubjMat{ii}(jj,:) = mean(data.([type 'ZStat'])(SubjROIChans{ii,jj},BOT));
+    end
+end
+hemSet{1} = 1:4;
+hemSet{2} = 5:7;
+for kk=1:2
+    display([hems{kk} ' accross subjects'])
+    for ii=1:3
+        display([ROIs{ii} ' t test results'])
+        ttestPrint(SubjMat{ii}(hemSet{kk},:),MAIN_alpha,time)
+    end
+end
+%% sub functions
 
 function ttestPrint(Y,alpha,time)
 

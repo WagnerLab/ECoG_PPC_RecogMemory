@@ -10,16 +10,15 @@ comparisonType  = opts.comparisonType;
 smoother        = opts.smoother;
 smootherSpan    = opts.smootherSpan;
 yLimits         = opts.yLimits;
-hemChans        = ismember(data.subjChans,find(strcmp(opts.hemId,opts.hems)))';
+subjs           = find(strcmp(opts.hemId,opts.hems));
+hemChans        = ismember(data.subjChans,subjs)';
 t               = data.trialTime;
 extStr          = data.extension;
 
-
-rois        = {'AG','IPS','SPL'};
-%rois        = {'IPS','SPL'};
-chIdx.IPS   = data.ROIid==1 & hemChans;
-chIdx.SPL   = data.ROIid==2 & hemChans;
-chIdx.AG    = data.ROIid==3 & hemChans;
+rois        = {'IPS','SPL','AG'};
+for ii=1:3
+    chIdx.(rois{ii})   = data.ROIid==ii & hemChans;
+end
 
 if ~strcmp(type,'erp'), extStr = [band extStr];end
 
@@ -27,7 +26,16 @@ if ~strcmp(type,'erp'), extStr = [band extStr];end
 X = cell(numel(rois),1);
 for r = 1:numel(rois)
     roistr = rois{r};
-    X{r} = data.(comparisonType)(chIdx.(roistr),:);
+    
+    switch opts.acrossWhat
+        case 'Channels'
+            X{r} = data.(comparisonType)(chIdx.(roistr),:);
+        case 'Subjects'
+            for ii=1:numel(subjs)
+                chans = chIdx.(roistr)&(data.subjChans'==subjs(ii));
+                X{r}(ii,:) = nanmean(data.(comparisonType)(chans,:));
+            end
+    end
 end
 
 figure(1); clf; %subplot(4,1,1)
@@ -50,7 +58,7 @@ elseif strcmp(type,'power')
 end
 
 if ~exist(plotPath,'dir'),mkdir(plotPath),end
-filename = [plotPath '/' opts.hems comparisonType 'ROIs_H-CR_' extStr];
+filename = [plotPath '/' opts.hems comparisonType 'ROIs_H-CR_' opts.acrossWhat extStr];
 %print(h.f,'-dtiff','-loose','-opengl','-r100',[filename '_2']);
 print(h.f,'-dtiff','-loose','-opengl','-r300',filename);
 set(gca,'yTickLabel',[]); set(gca,'xTickLabel',[]);
@@ -64,8 +72,18 @@ for r = 1:numel(rois)
     chns = chIdx.(roistr);
     
     X    = [];
-    X{1} = data.([measType 'Hits'])(chns,:);
-    X{2} = data.([measType 'CRs'])(chns,:);
+    switch opts.acrossWhat
+        case 'Channels'
+            X{1} = data.([measType 'Hits'])(chns,:);
+            X{2} = data.([measType 'CRs'])(chns,:);
+            
+        case 'Subjects'
+            for ii=1:numel(subjs)
+                chans = chIdx.(roistr)&(data.subjChans'==subjs(ii));
+                X{1}(ii,:) = nanmean(data.([measType 'Hits'])(chans,:));
+                X{2}(ii,:) = nanmean(data.([measType 'CRs'])(chans,:));
+            end            
+    end
     
     figure(1);
     axes(ha(r+1)); set(gca,'yTickLabelMode','auto')
@@ -88,7 +106,7 @@ for r = 1:numel(rois)
         plotPath = [savePath roistr '/' opts.band '/'];
     end
     if ~exist(plotPath,'dir'),mkdir(plotPath),end
-    filename = [plotPath '/' opts.hems measType 'H-CR_' roistr extStr];
+    filename = [plotPath '/' opts.hems measType 'H-CR_' roistr opts.acrossWhat extStr];
     %    print(h.f,'-dtiff','-loose','-opengl','-r100',[filename '2']);
     print(h.f,'-dtiff','-loose','-opengl','-r300',filename);
     set(gca,'yTickLabel',[]); set(gca,'xTickLabel',[]);
@@ -118,7 +136,7 @@ elseif strcmp(type,'power')
     plotPath = [savePath 'group/' opts.band '/'];
 end
 
-filename = [plotPath '/' opts.hems 'Comp' comparisonType 'Meas' measType 'groupROIs_H-CR_' extStr];
+filename = [plotPath '/' opts.hems 'Comp' comparisonType 'Meas' measType 'groupROIs_H-CR_'  opts.acrossWhat extStr];
 print(1,'-dtiff','-loose','-opengl','-r300',filename);
 
 
@@ -128,8 +146,19 @@ roistr = 'LPC';
 chns = (chIdx.AG+chIdx.IPS+chIdx.SPL)==1;
 
 X    = [];
-X{1} = data.([measType 'Hits'])(chns,:);
-X{2} = data.([measType 'CRs'])(chns,:);
+switch opts.acrossWhat
+    case 'Channels'
+        X{1} = data.([measType 'Hits'])(chns,:);
+        X{2} = data.([measType 'CRs'])(chns,:);
+        
+    case 'Subjects'
+        for ii=1:numel(subjs)
+            chans = chns &(data.subjChans'==subjs(ii));
+            X{1}(ii,:) = mean(data.([measType 'Hits'])(chans,:));
+            X{2}(ii,:) = mean(data.([measType 'CRs'])(chans,:));
+        end        
+end
+
 
 figure(6); clf
 set(gcf,'position',[200 200, opts.aRatio],'PaperPositionMode','auto')
@@ -144,7 +173,7 @@ elseif strcmp(type,'power')
     plotPath = [savePath roistr '/' opts.band '/'];
 end
 if ~exist('plotPath','dir'), mkdir(plotPath); end
-filename = [plotPath '/' opts.hems measType 'H-CR_' roistr extStr];
+filename = [plotPath '/' opts.hems measType 'H-CR_' roistr opts.acrossWhat extStr];
 %    print(h.f,'-dtiff','-loose','-opengl','-r100',[filename '2']);
 print(h.f,'-dtiff','-loose','-opengl','-r400',filename);
 set(gca,'yTickLabel',[]); set(gca,'xTickLabel',[]);

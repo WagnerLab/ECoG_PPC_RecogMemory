@@ -23,7 +23,7 @@ switch type
         clbar_map   = cMapGenerate(Colors,levels);
         
         ctmr_gauss_plot(handle,cortex,elecs,weights,hem,clbar_map);
-        el_add(elecs,'k',10);
+        el_add(elecs,'k',8);
         
     case 'UnSmoothCh'
         Colors = [;

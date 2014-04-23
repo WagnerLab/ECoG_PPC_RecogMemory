@@ -8,7 +8,7 @@ a= 0.49; b = 0.51;
 
 nBoots      = data.classificationParams.nBoots;
 nSubjs      = 7;
-nFeatures   = size(data.Bins,1)*numel(data.opts.bands);
+nFeatures   = size(data.X,2)*numel(data.opts.bands);
 
 % load univariate data for reference
 dataPath = '~/Documents/ECOG/Results/ERP_Data/group/';
@@ -56,6 +56,7 @@ data.meZBAC = nan(nChans,nWin);
 nConfPoints     = 9;
 data.confPoints = linspace(0.1,0.9,nConfPoints);
 
+data.ACbyConf      = nan(nChans,nWin,3,nConfPoints);
 data.mHsACbyConf   = nan(nChans,nWin,nConfPoints);
 data.sdHsACbyConf  = nan(nChans,nWin,nConfPoints);
 data.mCRsACbyConf  = nan(nChans,nWin,nConfPoints);
@@ -105,8 +106,10 @@ for s = 1:nSubjs
             [m,me,sd]   = grpstats(x,[],{'mean','median','std'});
             [~,p]       = ttest(x,0.5,0.05,'right');
             
+            
             data.mBAC(ChCount,bi)    = m;
             data.pBAC(ChCount,bi)    = p;
+            data.qBAC(ChCount,bi,:)  = quantile(x,[0.025,0.5 0.975]);
             data.cBAC(ChCount,bi)    = mean(x>0.5);
             data.meBAC(ChCount,bi)   = me;
             data.sdBAC(ChCount,bi)   = sd;
@@ -141,10 +144,10 @@ for s = 1:nSubjs
                 end
                 % correlate logits and RTs
                 %if ChCount == 4; keyboard;end
-                                
+                
                 probBootMat = nan(nTrials,nBoots);
                 for boot = 1:nBoots
-                    bIds    = data.BootIdxMat{s}(:,boot);
+                    bIds    = data.testIdx{s}(:,boot);
                     r1      = rts(bIds);
                     
                     probBootMat(bIds,boot) = data.out{s,ch,bi,boot}.probEst+0.5;
@@ -188,8 +191,9 @@ for s = 1:nSubjs
                     end         
                 end
                 
-                [acc1, acc0]     = accByConf(probBootMat,data.Y{s}, data.confPoints);
+                [acc1, acc0, accT]     = accByConf(probBootMat,data.sY{s}, data.confPoints);
                 
+                data.ACbyConf(ChCount,bi,:,:)      = quantile(accT,[0.025 0.5 0.975],1);
                 data.mHsACbyConf(ChCount,bi,:)     = nanmean(acc1);
                 data.sdHsACbyConf(ChCount,bi,:)    = nanstd(acc1);
                 data.mCRsACbyConf(ChCount,bi,:)    = nanmean(acc0);

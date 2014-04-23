@@ -38,7 +38,8 @@ function ctmr_gauss_plot(axhandle,cortex,electrodes,weights,v,cm, limits)
 
 %load in colormap
 %load('loc_colormap')
-if ~exist('cm','var'), load('loc_colormap_sym2'), end
+%if ~exist('cm','var'), load('loc_colormap_sym2'), end
+if ~exist('cm','var'), load('loc_colormap'), end
 
 brain=cortex.vert;
 %v='l';
@@ -96,13 +97,13 @@ material([.3 .6 .1 10 1]);
 axis off
 %set(gcf,'Renderer', 'zbuffer')
 
-% if v=='l'
-% view(270, 0);
-% set(l,'Position',[-1 0 1])        
-% elseif v=='r'
-% view(90, 0);
-% set(l,'Position',[1 0 1])        
-% end
+if v=='l'
+view(270, 0);
+set(l,'Position',[-1 0 1])        
+elseif v=='r'
+view(90, 0);
+set(l,'Position',[1 0 1])        
+end
 % %exportfig
 % exportfig(gcf, strcat(cd,'\figout.png'), 'format', 'png', 'Renderer', 'painters', 'Color', 'cmyk', 'Resolution', 600, 'Width', 4, 'Height', 3);
 % disp('figure saved as "figout"');

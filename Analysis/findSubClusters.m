@@ -5,9 +5,10 @@ function [out f] = findSubClusters(data,out, opts)
 % separating by cluster width and using that width to measure distance from
 % the decision boundary,
 
-sig1 = std(out.nDC(out.index==1,1));
-sig2 = std(out.nDC(out.index==2,2));
-out.SubClthr  = mean([sig1 sig2]);
+% sig1 = std(out.nDC(out.index==1,1));
+% sig2 = std(out.nDC(out.index==2,2));
+% out.SubClthr  = mean([sig1 sig2]);
+out.SubClthr = std(out.CDB(:,1));
 
 cLcol=[];
 cLcol(1,:)=[0.6  0.65 0.1];
@@ -19,9 +20,9 @@ SPLch = (data.hemChanId==1).*data.ROIid==2;
 
 chans = find(IPSch|SPLch);
 
-out.subCLChans{1}= chans(find(out.CDB(:,1)>=out.SubClthr));
-out.subCLChans{2}= chans(find(out.CDB(:,2)>=out.SubClthr));
-out.subCLChans{3}= chans(find(abs(out.CDB(:,1))<out.SubClthr));
+out.subCLChans{1}= chans(find(out.CDB>=out.SubClthr));
+out.subCLChans{2}= chans(find(out.CDB<=-out.SubClthr));
+out.subCLChans{3}= chans(find(abs(out.CDB)<out.SubClthr));
 
 if opts.plotting
     X = cell(3,1);

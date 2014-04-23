@@ -13,6 +13,8 @@ end
 
 BootIdxMat = zeros(nSamples,nBoots);
 for b = 1: nBoots
-    BootIdxMat(:,b)= [randsample(class1Idx,nSamples/2,false); ...
-        randsample(class2Idx,nSamples/2,false)];
+    BootIdxMat(:,b)= [randsample(class1Idx,nSamples/2,true); ...
+        randsample(class2Idx,nSamples/2,true)];
 end
+
+return

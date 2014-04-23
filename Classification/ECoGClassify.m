@@ -10,9 +10,9 @@ function out = ECoGClassify(S)
 % AG. last update Sept 23, 2013 -- nearest neighbor dtw decoder
 
 % dependencies:
-%   balancedCVfoldsIdx 
+%   balancedCVfoldsIdx
 %   toolboxes
-%   
+%
 
 X = S.X;
 Y = double(S.Y);
@@ -20,7 +20,8 @@ Y = double(S.Y);
 % assumes label come in as 1 for POS class, -1 for NEG class
 Y(Y==0) = -1;
 
-N = numel(Y);
+Ntrain = numel(Y);
+Ntest  = numel(S.BootTestIdx);
 P = size(X,2);
 
 out             = [];
@@ -28,8 +29,11 @@ out.settings    = S.classificationParams;
 nFolds          = out.settings.nFolds;
 toolbox         = out.settings.toolbox;
 
-testIdx         = balancedCVfoldsIdx(Y,nFolds);
-out.testIdx     = testIdx;
+testFoldIdx      = S.BootTestFoldIdx;
+trainFoldIdx     = S.BootTrainFoldIdx;
+
+%testIdx         = balancedCVfoldsIdx(Y,nFolds);
+%out.testIdx     = testIdx;
 
 switch toolbox
     case 'liblinear'
@@ -43,11 +47,11 @@ switch toolbox
         Cparams     = opts.CParamSet;
         nCparams    = numel(Cparams);
         Eparams     = opts.EParamSet;
-        nEparams    = numel(opts.EParamSet);        
+        nEparams    = numel(opts.EParamSet);
         paramFolds  = opts.paramFolds;
         trainOpts   = opts.trainOpts;
         
-        % determine termination criterion        
+        % determine termination criterion
         m = zeros(nEparams,1);
         for er = 1: nEparams
             m(er) = train(Y, X,['-s 0 -q -c ' num2str(size(X,2)) ' -e ' num2str(Eparams(er)) ' -v 10']);
@@ -57,41 +61,50 @@ switch toolbox
         clear m;
         
         parfor fold = 1:nFolds
-            trainIdx = testIdx~=fold;
-            
-            % hyper parameter selection; using an inner cross validation
-            m = NaN(nCparams,1);
-            for pr = 1:nCparams
-                %optionsSet = [trainOpts ' -c ' num2str(params(pr))];
-                %m(pr) = do_binary_cross_validation2(Y(trainIdx), X(trainIdx,:), optionsSet,paramFolds);
-                optionsSet  = [trainOpts ' -c ' num2str(Cparams(pr)) ' -v ' num2str(paramFolds) ' -e ' num2str(terCrit)];
-                m(pr)       = train(Y(trainIdx), X(trainIdx,:), optionsSet);
+            %trainIdx = testIdx~=fold;
+            trainIdx = trainFoldIdx(:,fold);
+            testIdx  = testFoldIdx(:,fold);
+            if nCparams >1
+                % hyper parameter selection; using an inner cross validation
+                m = NaN(nCparams,1);
+                for pr = 1:nCparams
+                    %optionsSet = [trainOpts ' -c ' num2str(params(pr))];
+                    %m(pr) = do_binary_cross_validation2(Y(trainIdx), X(trainIdx,:), optionsSet,paramFolds);
+                    optionsSet  = [trainOpts ' -c ' num2str(Cparams(pr)) ' -v ' num2str(paramFolds) ' -e ' num2str(terCrit)];
+                    m(pr)       = train(Y(trainIdx), X(trainIdx,:), optionsSet);
+                end
+                
+                grid_maxc_idx   =   find(m==max(m(:)));
+                maxc            =   Cparams(grid_maxc_idx(1));
+                
+                % search around best found parameters in the grid search
+                % function, search for min...
+                %             f = @(params) (1-do_binary_cross_validation(Y(trainIdx),  X(trainIdx,:), ...
+                %                 [trainOpts '-c ' num2str(maxc)], paramFolds));
+                %             maxc = fminsearch(@(params) f(params),maxc);
+                
+                optParam(fold)= maxc;
+            else
+                optParam(fold) = Cparams;
             end
             
-            grid_maxc_idx   =   find(m==max(m(:)));
-            maxc            =   Cparams(grid_maxc_idx(1));
-            
-            % search around best found parameters in the grid search
-            % function, search for min...            
-%             f = @(params) (1-do_binary_cross_validation(Y(trainIdx),  X(trainIdx,:), ...
-%                 [trainOpts '-c ' num2str(maxc)], paramFolds));
-%             maxc = fminsearch(@(params) f(params),maxc);
-                        
-            optParam(fold)= maxc;
-            
             % Final Model for fold
-            model = train(Y(trainIdx), X(trainIdx,:), [trainOpts ' -c ' num2str(maxc) ' -e ' num2str(terCrit)]);
+            model = train(Y(trainIdx), X(trainIdx,:), [trainOpts ' -c ' num2str(optParam(fold)) ' -e ' num2str(terCrit)]);
             weights(fold,:) = model.w;
             
-            % Prediction/Test for fold            
-            [~,~,prob_pred] = predict(Y(~trainIdx), X(~trainIdx,:), model,'-b 1');         
+            % Prediction/Test for fold
+            %[~,~,prob_pred] = predict(Y(~trainIdx), X(~trainIdx,:), model,'-b 1');
+            [~,~,prob_pred] = predict(Y(testIdx), X(testIdx,:), model,'-b 1');
             predcell{fold} = prob_pred(:,1);
         end
         
         % rearange  test prediction into their actual index locations
-        probEst = nan(N,1);
+        probEst = nan(Ntest,1);
         for fold =1:nFolds
-            probEst(testIdx==fold) = predcell{fold};
+            %probEst(testIdx==fold) = predcell{fold};
+            nTests = size(predcell{fold});
+            testfoldSampIdx     = (fold*nTests-(nTests-1)):nTests*fold;
+            probEst(testfoldSampIdx) = predcell{fold};
         end
         if strcmp(solver, '0')
             probEst = probEst -0.5;
@@ -101,14 +114,14 @@ switch toolbox
         if sum(probEst==0)>0
             nBadtrials = sum(probEst==0);
             predictions(probEst==0) = rand(nBadtrials,1) > 0.5;
-        end        
+        end
         
         % store output data
         out.predictions = predictions;
         out.probEst     = probEst;
         out.weights     = weights;
         out.optParam    = optParam;
-        out.terCrit     = terCrit;   
+        out.terCrit     = terCrit;
     case 'libsvm'
         
         optParam1   = NaN(nFolds,1);
@@ -149,7 +162,7 @@ switch toolbox
             predcell{fold} = pred;
         end
         
-        predictions = NaN(N,1);
+        predictions = NaN(Ntrain,1);
         for fold =1:nFolds
             predictions(testIdx==fold) = predcell{fold};
         end
@@ -173,7 +186,7 @@ switch toolbox
             trainIdx    = testIdx~=fold;
             m           = cvglmnet2(X(trainIdx,:),(Y(trainIdx)==1)+1,paramFolds,[],'class','binomial',opts,0);
             
-            % get the best one and retrain on the whole training set            
+            % get the best one and retrain on the whole training set
             minlambdas(fold)    = m.lambda_min; mL_id(fold) = find(m.glmnet_object.lambda==m.lambda_min);
             
             betasPath(fold,:,:) = m.glmnet_object.beta';
@@ -182,7 +195,7 @@ switch toolbox
             predcell{fold}      = glmnetPredict(m.glmnet_object, 'response', X(~trainIdx,:), minlambdas(fold));
         end
         
-        probEst = NaN(N,1);
+        probEst = NaN(Ntrain,1);
         for fold =1:nFolds
             probEst(testIdx==fold) = predcell{fold};
         end
@@ -201,10 +214,10 @@ switch toolbox
         out.probEst     = probEst;
         out.weights     = [betas a0];
         out.optParam    = minlambdas;
-        out.betasPath   = squeeze(median(betasPath)); 
+        out.betasPath   = squeeze(median(betasPath));
     case 'NNDTW'
-                               
-        opts        = out.settings.options;        
+        
+        opts        = out.settings.options;
         Knn         = opts.Kparam;          % number of nearest neighbors
         maxDist     = opts.maxDistParam;    % maximum distortion on dtw (w param)
         
@@ -212,7 +225,7 @@ switch toolbox
         if opts.filterData
             LP = opts.LP;
             X = applyFilter(LP,X);
-            X = X(:,1:opts.downRate:end);            
+            X = X(:,1:opts.downRate:end);
         end
         
         votecell = cell(nFolds,1);
@@ -221,13 +234,13 @@ switch toolbox
             trainIdx = find(testIdx~=fold);
             
             bestMatches = knnsearch(X(trainIdx,:),X(testIdx==fold,:),'distance',func,'K',Knn);
-                    
+            
             votecell{fold} = sum(Y(trainIdx(bestMatches)),2);
             predcell{fold} = median(Y(trainIdx(bestMatches)),2);
         end
         
         % rearange  test prediction into their actual index locations
-        probEst = nan(N,1);
+        probEst = nan(Ntrain,1);
         predictions = probEst;
         for fold =1:nFolds
             probEst(testIdx==fold) = votecell{fold};
@@ -237,7 +250,7 @@ switch toolbox
         if sum(probEst==0)>0
             nBadtrials = sum(probEst==0);
             predictions(probEst==0) = rand(nBadtrials,1) > 0.5;
-        end        
+        end
         
         % store output data
         out.predictions = predictions;
@@ -247,3 +260,5 @@ switch toolbox
     otherwise
         error('classification toolbox not found')
 end
+
+return
