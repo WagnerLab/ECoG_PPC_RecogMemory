@@ -119,8 +119,14 @@ set(ha(2),'position',[lMargin+subAxW+betweenColSpace bMargin+subAxH+betweenRowSp
 set(ha(3),'position',[lMargin bMargin subAxW subAxH])
 set(ha(4),'position',[lMargin+subAxW+betweenColSpace bMargin subAxW subAxH])
 
-chanIDs   = find(ClusterSet{1}.chans);
-Ks      = [3 3 4 4];
+chanIDs     = find(ClusterSet{1}.chans);
+Ks          = [3 3 4 4];
+
+ClColorId   = cell(4,1);
+ClColorId{1}= [1 2 3];
+ClColorId{2}= [1 3 2];
+ClColorId{3}= [4 3 1 2];
+ClColorId{4}= [2 3 1 4];
 
 for ii = 1:4
     axes(ha(ii))
@@ -131,7 +137,7 @@ for ii = 1:4
     CLId = ClusterSet{ii}.index;
     for jj = 1:Ks(ii)
         el_add(chanLocs(chanIDs(CLId==jj),:),'k',30);
-        el_add(chanLocs(chanIDs(CLId==jj),:),ClCol{jj},25);
+        el_add(chanLocs(chanIDs(CLId==jj),:),ClCol{ClColorId{ii}(jj)},25);
     end
     
 end
