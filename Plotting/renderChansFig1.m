@@ -42,13 +42,13 @@ text(0.05,0.45,' a ','fontsize',28)
 set(gca,'visible','off')
 
 axes('position',[0.120 .25 0.03 0.1]); hold on;
-plot([0.4],[3],'o','color',opts.ROIColors(1,:),'markersize',15,'markerfacecolor',opts.ROIColors(1,:))
-plot([0.4],[2],'o','color',opts.ROIColors(2,:),'markersize',15,'markerfacecolor',opts.ROIColors(2,:))
+plot([0.4],[3],'o','color',opts.ROIColors(2,:),'markersize',15,'markerfacecolor',opts.ROIColors(2,:))
+plot([0.4],[2],'o','color',opts.ROIColors(1,:),'markersize',15,'markerfacecolor',opts.ROIColors(1,:))
 plot([0.4],[1],'o','color',opts.ROIColors(3,:),'markersize',15,'markerfacecolor',opts.ROIColors(3,:))
 
 xlim([0 0.8]); ylim([0.5 3.5])
-text(0.9,3,'IPS','fontsize',16)
-text(0.9,2,'SPL','fontsize',16)
+text(0.9,3,'SPL','fontsize',16)
+text(0.9,2,'IPS','fontsize',16)
 text(0.9,1,'AG ','fontsize',16)
 set(gca,'visible','off')
 

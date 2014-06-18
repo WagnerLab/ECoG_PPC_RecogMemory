@@ -85,7 +85,8 @@ for row = 1:3
         hold on;
         for ii = 1:size(sigBins,1)
             if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                plot(sigBins(ii,:),[sigBar sigBar],'linewidth',2,'color',0.1*ones(3,1))
+                plot(sigBins(ii,:),[sigBar sigBar],'linewidth',2,'color',0.3*ones(3,1))
+                plot(mean(sigBins(ii,:)),[sigBar sigBar],'*','linewidth',2,'color',0.1*ones(3,1))
             end
         end
         
@@ -127,7 +128,7 @@ cd(SupPlotPath)
 addpath(cPath)
 addpath([cPath '/Plotting/'])
 
-filename = 'sFig12_ERPs-TC';
+filename = 'sFig10_ERPs-TC';
 plot2svg([filename '.svg'],gcf)
 eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
 cd(cPath)

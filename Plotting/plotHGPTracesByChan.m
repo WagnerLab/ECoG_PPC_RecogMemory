@@ -189,7 +189,7 @@ end
 
 %% bar graphs and time courses
 
-if 1
+if 0
     f(5) = figure(5); clf;
     figW = 1200;
     figH = 600;
@@ -197,7 +197,7 @@ if 1
     ha = tight_subplot(2,4);
     
     xPos= [0.1 0.43 0.52 0.61];
-    yPos= [0.52 0.06];
+    yPos= [0.55 0.09];
     tcW = 0.32; bW  = 0.08; tcH = 0.44;
     
     linePos = 0.89;
@@ -234,7 +234,8 @@ if 1
             hold on;
             for ii = 1:size(sigBins,1)
                 if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                    plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.1*ones(3,1))
+                    plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.3*ones(3,1))
+                    plot(mean(sigBins(ii,:)),1.4,'*','linewidth',2,'color',0.1*ones(3,1))
                 end
             end
             
@@ -291,6 +292,16 @@ if 1
     %text(0.05,0.45,'b. HGP (dB)','fontsize',24,'fontWeight','bold')
     set(gca,'visible','off')
     
+    axes('position',[xPos(1) 0 tcW 0.08])
+    text(0.5,0.25,' Time(s) ','fontsize',20,'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle')
+    set(gca,'visible','off')
+    
+    axes('position',[xPos(4) 0 tcW 0.08])
+    text(0.5,0.25,' Time(s) ','fontsize',20,'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle')
+    set(gca,'visible','off')
+    
     cPath = pwd;
     cd(opts.plotPath)
     addpath(cPath)
@@ -304,7 +315,7 @@ end
 
 %% plot AG trace
 
-if 0
+if 1
     f(6) = figure(6); clf;
     figW = 900;
     figH = 300;
@@ -344,7 +355,8 @@ if 0
         hold on;
         for ii = 1:size(sigBins,1)
             if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.1*ones(3,1))
+                    plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.3*ones(3,1))
+                    plot(mean(sigBins(ii,:)),1.4,'*','linewidth',2,'color',0.1*ones(3,1))
             end
         end
         
@@ -447,7 +459,8 @@ if 1
             hold on;
             for ii = 1:size(sigBins,1)
                 if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                    plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.1*ones(3,1))
+                     plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.3*ones(3,1))
+                    plot(mean(sigBins(ii,:)),1.4,'*','linewidth',2,'color',0.1*ones(3,1))
                 end
             end
            

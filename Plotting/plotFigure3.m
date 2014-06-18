@@ -321,6 +321,7 @@ if 1
         sigBins = t{col}(h==1);
         for ii = 1:numel(sigBins)
             plot([-0.05 0.05]+sigBins(ii),sigBar{1},'linewidth',2,'color',colors{1})
+            plot(sigBins(ii),sigBar{1}(1),'*','linewidth',2,'color',colors{1})            
         end
         
         % plot sig bar SPL
@@ -328,6 +329,7 @@ if 1
         sigBins = t{col}(h==1);
         for ii = 1:numel(sigBins)
             plot([-0.05 0.05]+sigBins(ii),sigBar{2},'linewidth',2,'color',colors{2})
+            plot(sigBins(ii),sigBar{2}(1),'*','linewidth',2,'color',colors{2})            
         end
         
         

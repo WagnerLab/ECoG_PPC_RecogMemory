@@ -50,8 +50,8 @@ load([opts.dataPath fileName2]);
 data2            = data;
 clear data; close all
 
-%plotHGPTracesByChan(data1,data2,opts);
-plotHGPTracesBySubj(data1,data2,opts);
+plotHGPTracesByChan(data1,data2,opts);
+%plotHGPTracesBySubj(data1,data2,opts);
 
 addpath Plotting/
 addpath lib/
@@ -171,7 +171,7 @@ data4 = S; % stimLock by ROI
 
 opts.savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/Fig3/';
 close all
-%plotFigure3(data1,data2,data3,data4,opts)
+plotFigure3(data1,data2,data3,data4,opts)
 
 %% plot ERP figure
 

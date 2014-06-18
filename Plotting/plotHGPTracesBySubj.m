@@ -79,7 +79,8 @@ for row = 1:2
         hold on;
         for ii = 1:size(sigBins,1)
             if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.1*ones(3,1))
+                plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.3*ones(3,1))
+                plot(mean(sigBins(ii,:)),1.4,'*','linewidth',2,'color',0.1*ones(3,1))
             end
         end
         

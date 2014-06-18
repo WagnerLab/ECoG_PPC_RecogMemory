@@ -607,7 +607,7 @@ opts                = [];
 opts.hems           = 'all';
 opts.lockType       = 'RT';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-opts.type           = 'power'; opts.band = 'hgam';
+opts.type           = 'erp'; opts.band = '';
 %opts.type           = 'power'; opts.band = 'hgam';
 opts.bin            = 'Bin'; % options are{'BigBin', 'Bin'};
 opts.byBlockFlag    = 0;

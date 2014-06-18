@@ -149,6 +149,17 @@ if 0
         axis off
     end
     
+    % ROI legend
+    axes('position',[0.33 .15 0.03 0.06]); hold on;
+    plot([0.4],[2],'o','color',GpCol{1},'markersize',10,'markerfacecolor',GpCol{1})
+    plot([0.4],[1],'o','color',GpCol{2},'markersize',10,'markerfacecolor',GpCol{2})
+
+    xlim([0 0.8]); ylim([0.5 2.5])
+    text(0.9,2,'IPS','fontsize',12)
+    text(0.9,1,'SPL','fontsize',12)    
+    set(gca,'visible','off')
+    % 
+    
     cPath = pwd;
     cd(opts.plotPath)
     addpath(cPath)
@@ -219,9 +230,9 @@ if 0
     end
     
     print(gcf,'-dtiff',['-r' num2str(opts.resolution)],[opts.plotPath filename])
-    
-    %% time courses
-    
+end
+%% time courses
+if 0
     f = figure(4); clf;
     figW = 1000;
     set(gcf,'position',[-1000 200,figW,figH],'PaperPositionMode','auto','color','w')
@@ -230,7 +241,7 @@ if 0
     leftMargin = 0.1;
     tcH = 0.44; tcW = 0.415;
     xPos = [leftMargin tcW+leftMargin+0.02];
-    yPos = [0.52 0.06];
+    yPos = [0.54 0.08];
     
     set(ha(1),'position',[xPos(1) yPos(1) tcW tcH])
     set(ha(2),'position',[xPos(2) yPos(1) tcW tcH])
@@ -245,10 +256,10 @@ if 0
     
     smoother    = opts.smoother;
     smootherSpan= opts.smootherSpan;
-      
+    
     yLimits = [-1 3];
-    yRefLims= [yLimits(1)*0.3 yLimits(2)*0.3];   
-
+    yRefLims= [yLimits(1)*0.3 yLimits(2)*0.3];
+    
     cnt = 1;
     for row = 1:2
         for col = 1:2
@@ -269,13 +280,16 @@ if 0
             for ii = 1:size(sigBins,1)
                 if sigBins(ii,1) >= timeLims(col,1) && sigBins(ii,2) <= timeLims(col,2)
                     if row==1
-                        plot(sigBins(ii,:),[2 2],'linewidth',2,'color',0.1*ones(3,1))
+                        plot(sigBins(ii,:),[2 2],'linewidth',2,'color',0.3*ones(3,1))
+                        plot(mean(sigBins(ii,:)),2,'*','linewidth',2,'color',0.1*ones(3,1))
                     elseif row==2
-                        plot(sigBins(ii,:),[2.8 2.8],'linewidth',2,'color',0.1*ones(3,1))
+                        plot(sigBins(ii,:),[2.8 2.8],'linewidth',2,'color',0.3*ones(3,1))
+                        plot(mean(sigBins(ii,:)),2.8,'*','linewidth',2,'color',0.1*ones(3,1))
                     end
                 end
             end
             
+            set(gca,'xtick',timeTicks(col,:),'XtickLabel',[])
             if (cnt==1)
                 ylabel(' CL1  HGP (dB) ','fontsize',fontSize,'fontWeight','normal')
                 text(-0.18,-0.8, sprintf('n=%d',numel(CLChans{row})),'fontsize',fontSize)
@@ -297,8 +311,7 @@ if 0
             end
             set(gca,'fontsize',18,'fontWeight','normal')
             set(gca,'ytick',[0 1.25 2.5])
-            set(gca,'yticklabel',{'0','','2.5'})
-            set(gca,'xtick',timeTicks(colB,:),'XtickLabel',[])
+            set(gca,'yticklabel',{'0','','2.5'})            
             
             cnt = cnt +1;
         end
@@ -306,6 +319,11 @@ if 0
     
     axes('position', [0.001 0.95 0.3 0.05]); xlim([0 1]); ylim([0 1])
     text(0.05,0.45,' c ','fontsize',28)
+    set(gca,'visible','off')
+    
+    axes('position',[xPos(1) 0 xPos(2)+tcW-xPos(1) 0.08])
+    text(0.5,0.25,' Time(s) ','fontsize',20,'HorizontalAlignment','center', ...
+        'VerticalAlignment','middle')
     set(gca,'visible','off')
     
     cPath = pwd;
@@ -346,7 +364,7 @@ if 1
     
     
     yLimits = [-1 3];
-    yRefLims= [yLimits(1)*0.3 yLimits(2)*0.3];        
+    yRefLims= [yLimits(1)*0.3 yLimits(2)*0.3];
     
     yTicks = [0 1.5 3];
     yTickStr = {'0','','3'};
@@ -372,8 +390,8 @@ if 1
             hold on;
             for ii = 1:size(sigBins,1)
                 if sigBins(ii,1) >= timeLims(colB,1) && sigBins(ii,2) <= timeLims(colB,2)
-                    
-                    plot(sigBins(ii,:),[2.8 2.8],'linewidth',2,'color',0.1*ones(3,1))
+                    plot(sigBins(ii,:),[2.8 2.8],'linewidth',2,'color',0.3*ones(3,1))
+                    plot(mean(sigBins(ii,:)),2.8,'*','linewidth',2,'color',0.1*ones(3,1))                    
                 end
             end
             
@@ -450,8 +468,8 @@ if 1
     yLimits{2} = [-1 3.8];
     
     yRefLims    = cell(2,1);
-    yRefLims{1} = [yLimits{1}(1)*0.3 yLimits{1}(2)*0.3];    
-    yRefLims{2} = [yLimits{2}(1)*0.3 yLimits{2}(2)*0.3];    
+    yRefLims{1} = [yLimits{1}(1)*0.3 yLimits{1}(2)*0.3];
+    yRefLims{2} = [yLimits{2}(1)*0.3 yLimits{2}(2)*0.3];
     
     yTicks = cell(2,1);
     yTicks{1} = [0 1 2];
@@ -483,9 +501,11 @@ if 1
             for ii = 1:size(sigBins,1)
                 if sigBins(ii,1) >= timeLims(colB,1) && sigBins(ii,2) <= timeLims(colB,2)
                     if row==1
-                        plot(sigBins(ii,:),[1.8 1.8],'linewidth',2,'color',0.1*ones(3,1))
+                        plot(sigBins(ii,:),[1.8 1.8],'linewidth',2,'color',0.3*ones(3,1))
+                        plot(mean(sigBins(ii,:)),1.8,'*','linewidth',2,'color',0.1*ones(3,1))                        
                     else
-                        plot(sigBins(ii,:),[3.6 3.6],'linewidth',2,'color',0.1*ones(3,1))
+                        plot(sigBins(ii,:),[3.6 3.6],'linewidth',2,'color',0.3*ones(3,1))
+                        plot(mean(sigBins(ii,:)),3.6,'*','linewidth',2,'color',0.1*ones(3,1))                        
                     end
                 end
             end
@@ -599,7 +619,7 @@ end
         h1 = scatter(nDC(chanIDs==1,1),nDC(chanIDs==1,2));
         set(h1,'markeredgeColor',[0 0 0],'markerfacecolor',GpCol{1}, 'sizeData',100, 'marker','o')
         h2 = scatter(nDC(chanIDs==2,1),nDC(chanIDs==2,2));
-        set(h2,'markeredgeColor',[0 0 0],'markerfacecolor',GpCol{2},'sizeData',100, 'marker','d')
+        set(h2,'markeredgeColor',[0 0 0],'markerfacecolor',GpCol{2},'sizeData',100, 'marker','o')
         
         set(gca, 'linewidth',4,'xtick',0:0.2:1,'ytick',0:0.2:1,'fontsize',fontSize)
         axis off
