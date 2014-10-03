@@ -1,4 +1,4 @@
-function printStats(data,opts)
+function printStats(data,opts,type,center)
 % main statistics from time courses
 
 ROIs        = {'IPS','SPL','AG'};
@@ -6,34 +6,28 @@ ROIs        = {'IPS','SPL','AG'};
 % number of tests
 mMain           = 1;
 mInter          = 1*3;
-type            = 'Bin';
 MAIN_alpha      = 0.05/mMain;
 INTER_alpha     = 0.05/mInter;
 
 % time bins of interest
-BOT         = find((data.Bins(:,1) >= opts.time(1)) & (data.Bins(:,2) <= opts.time(2)));
+BOT         = find((data.Bins(:,1) >= opts.timeLims(1)) & (data.Bins(:,2) <= opts.timeLims(2)));
 
 hemChans        = [data.hemChanId==1 data.hemChanId==2];
 hemROIChans     = cell(2,3);
 for ii=1:2;
     for jj=1:3
-        hemROIChans{ii,jj}   = data.ROIid.*hemChans(:,ii) == ii;
+        hemROIChans{ii,jj}   = data.ROIid.*hemChans(:,ii) == jj;
     end
 end
 
 SubjROIChans      = cell(3,7);
 for ii = 1:3
     for jj=1:7;
-        SubjROIChans{ii,jj} = data.ROIid.*(data.subjChans'==jj) == ii;
+        SubjROIChans{ii,jj} = data.ROIid.*(data.subjChans==jj) == ii;
     end
 end
 
-switch type,
-    case 'Bin'
-        time = data.Bins(BOT,:);
-    case 'BigBin'
-        time = data.BigBins;
-end
+time = data.Bins(BOT,:);
 
 %% main
 
@@ -44,8 +38,8 @@ for kk = 1:2
     % main across channels effects
     for ii = 1:3
         display([ROIs{ii} ' t test results'])
-        ChanMat{ii} = data.([type 'ZStat'])(hemROIChans{kk,ii},BOT);
-        ttestPrint(ChanMat{ii},MAIN_alpha,time)
+        ChanMat{ii} = data.(type)(hemROIChans{kk,ii},BOT);
+        ttestPrint(ChanMat{ii},MAIN_alpha,time,center)
     end
     % roi interactions
     for ii = 1:2
@@ -61,7 +55,7 @@ fprintf('\n\n')
 SubjMat = cell(3);
 for ii = 1:3
     for jj = 1:7
-        SubjMat{ii}(jj,:) = mean(data.([type 'ZStat'])(SubjROIChans{ii,jj},BOT));
+        SubjMat{ii}(jj,:) = mean(data.(type)(SubjROIChans{ii,jj},BOT));
     end
 end
 hemSet{1} = 1:4;
@@ -70,15 +64,15 @@ for kk=1:2
     display([hems{kk} ' accross subjects'])
     for ii=1:3
         display([ROIs{ii} ' t test results'])
-        ttestPrint(SubjMat{ii}(hemSet{kk},:),MAIN_alpha,time)
+        ttestPrint(SubjMat{ii}(hemSet{kk},:),MAIN_alpha,time,center)
     end
 end
 %% sub functions
 
-function ttestPrint(Y,alpha,time)
+function ttestPrint(Y,alpha,time,center)
 
 XX = mean(Y,2);
-[~,p,~,stat]=ttest(XX,0,alpha);
+[~,p,~,stat]=ttest(XX,center,alpha);
 display('Main Effect')
 fprintf('T = %g, P = %g \n',stat.tstat,p);
 
