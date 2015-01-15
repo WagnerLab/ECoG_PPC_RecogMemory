@@ -1,0 +1,13 @@
+function [TimeMarkers,Samps,Error] = matchSampsToTime(origTimeMarkers,Time)
+
+% this function finds the closest sample that matches origTimeMarkers to Time.
+
+nMarkers=  numel(origTimeMarkers);
+
+TimeMarkers = zeros(nMarkers,1);
+Samps 		= zeros(nMarkers,1);
+Error       = zeros(nMarkers,1);
+for iM = 1:nMarkers
+	[TimeMarkers(iM),Samps(iM)]=min(abs(origTimeMarkers(iM)-Time));
+    
+end

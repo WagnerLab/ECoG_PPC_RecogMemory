@@ -651,7 +651,7 @@ csvwrite([savePath opts.bin timeStr fileName blockStr '.csv'],single(out));
 
 %% decoding
 
-clear all; close all;
+clearvars; close all;
 addpath Classification/
 addpath lib/
 
@@ -671,11 +671,11 @@ opts.timeType       = 'Bin';
 % channelGroupingType makes the distinction between decoding between channels, rois or
 % all channels within LPC
 % options are {'channel','ROI','IPS-SPL','all'};
-opts.channelGroupingType      = 'channel';
-% timeFeatures distinguishes between taking the whole trial or taking a
+opts.channelGroupingType      = 'ROI';
+% timeFeatures distinguishes between takingv the whole trial or taking a
 % window of time
 % options are {'window','trial'};
-opts.timeFeatures   = 'trial';
+opts.timeFeatures   = 'window';
 
 switch opts.lockType
     case 'RT'
@@ -713,8 +713,8 @@ opts.dataType       = 'power'; opts.bands          = {'hgam'};
 %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
 opts.toolboxNum     = 1;
 opts.timeType       = 'Bin';
-opts.channelGroupingType      = 'channel';
-opts.timeFeatures   = 'trial';
+opts.channelGroupingType      = 'ROI';
+opts.timeFeatures   = 'window';
 opts.extStr         = 'liblinearS0';%'NNDTWK5';%
 
 switch opts.lockType
@@ -875,3 +875,21 @@ savePath = '../Results/lagAnalysis/';
 if ~exist(savePath,'dir'), mkdir(savePath), end;
 fileName = ['lag' opts.analysis 'Analysis' opts.lockType 'Lock' opts.dataType cell2mat(opts.bands)];
 save([savePath fileName])
+
+%% get spectrogram
+addpath PreProcessing/
+
+dateStr = '27-May-2013';
+%subjects = {'16b'};
+subjects = {'16b','18','24','28'};
+%dateStr = '17-Jun-2013';
+%subjects = {'17b','19','29'};
+reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
+dataPath = '../Results/';
+for s = subjects
+    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
+    data=spectrogramWrapper(dataIn.data);
+    save([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData.mat'],'data')
+    fprintf('Analysis Completed for subjectd %s \n',s{1});
+end
+
