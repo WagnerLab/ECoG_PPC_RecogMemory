@@ -605,10 +605,10 @@ clc
 
 opts                = [];
 opts.hems           = 'all';
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-opts.type           = 'erp'; opts.band = '';
-%opts.type           = 'power'; opts.band = 'hgam';
+%opts.type           = 'erp'; opts.band = '';
+opts.type           = 'power'; opts.band = 'hgam';
 opts.bin            = 'Bin'; % options are{'BigBin', 'Bin'};
 opts.byBlockFlag    = 0;
 
@@ -878,6 +878,7 @@ save([savePath fileName])
 
 %% get spectrogram
 addpath PreProcessing/
+addpath Analysis/
 
 dateStr = '27-May-2013';
 %subjects = {'16b'};
@@ -889,7 +890,32 @@ dataPath = '../Results/';
 for s = subjects
     dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
     data=spectrogramWrapper(dataIn.data);
-    save([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData.mat'],'data')
+    
+    save([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data')
     fprintf('Analysis Completed for subjectd %s \n',s{1});
 end
+%% epoch the spectrograms
+addpath PreProcessing/
+addpath Analysis/
+
+subjects = {'16b','18','24','28'};
+
+%subjects = {'17b','19','29'};
+lockType = 'stim';
+dataPath = '../Results/';
+if strcmp(lockType,'stim')
+    epochLims   = [-0.2 1]; % in seconds
+else strcmp(lockType,'RT')
+    epochLims   = [-1 0.2]; % in seconds
+end
+for s = subjects        
+    load([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');
+    data.SpecSR = 1./mean(diff(data.Time));
+    data.epochLims          = epochLims;
+    data.epochLimsSamps = round(epochLims*data.SR);
+    
+    
+    
+end
+
 

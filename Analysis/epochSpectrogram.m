@@ -23,7 +23,7 @@ nFreqs = size(dataMat,2);
 nTimeP = size(dataMat,3);
 
 nTrials = numel(epochSampleMarkers);
-epochLength = epochLimits(2)-epochLimits(1);
+epochLength = epochLimits(2)-epochLimits(1)+1;
 
 out = zeros(nChans,nFreqs,nTrials,epochLength);
 

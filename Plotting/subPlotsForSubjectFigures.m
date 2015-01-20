@@ -17,7 +17,11 @@ function ha = subPlotsForSubjectFigures(dataStruct,axesCoords)
 
 smoother       	= 'loess';
 smootherSpan   	= 0.15;
-yLimits 		= [-1.2 2.2];
+if ~isfield(dataStruct,'yLimits')
+    yLimits 		= [-1.2 2.2];
+else
+    yLimits         = dataStruct.yLimits;
+end
 yRefLims    = [yLimits(1)*0.3 yLimits(2)*0.3];    
 timeTicks   	= {-0.2:0.2:1, -1:0.2:0.2};
 
