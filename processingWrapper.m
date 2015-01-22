@@ -911,11 +911,12 @@ end
 for s = subjects        
     load([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');
     data.SpecSR = 1./mean(diff(data.Time));
-    data.epochLims          = epochLims;
-    data.epochLimsSamps = round(epochLims*data.SR);
+    data.epochLims               = epochLims;
+    data.epochLimsSamps     = round(epochLims*data.SpecSR);
     
-    
-    
+    [data.Power,data.avgChanPower]      = normalizeSpectrogram(data.Power);
+    data.trialSpectrogram                       = epochSpectrogram(data.Power,data.EventSamps,data.epochLimsSamps);
+    data.Power                                        =[];       
 end
 
 
