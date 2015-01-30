@@ -897,26 +897,47 @@ end
 %% epoch the spectrograms
 addpath PreProcessing/
 addpath Analysis/
+addpath Lib/
 
 subjects = {'16b','18','24','28'};
-
 %subjects = {'17b','19','29'};
-lockType = 'stim';
-dataPath = '../Results/';
-if strcmp(lockType,'stim')
-    epochLims   = [-0.2 1]; % in seconds
-else strcmp(lockType,'RT')
-    epochLims   = [-1 0.2]; % in seconds
-end
+lockType = 'RT';
+dataPath = '../Results/Spectral_Data/';
+
 for s = subjects        
-    load([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');
-    data.SpecSR = 1./mean(diff(data.Time));
-    data.epochLims               = epochLims;
-    data.epochLimsSamps     = round(epochLims*data.SpecSR);
+    fprintf('epoching spectrograms for subjects %s \n',s{1})
     
-    [data.Power,data.avgChanPower]      = normalizeSpectrogram(data.Power);
-    data.trialSpectrogram                       = epochSpectrogram(data.Power,data.EventSamps,data.epochLimsSamps);
-    data.Power                                        =[];       
+    dataIn=load([dataPath '/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');    
+    dataIn=dataIn.data;
+    dataIn.lockType = lockType;
+    
+    savePath  = strcat(dataPath, 'subj', s{1}, '/epoched/');
+    if ~exist(savePath,'dir')
+        mkdir(savePath);
+    end
+    
+    if strcmp(lockType,'RT')
+        stimData = load([savePath,'stim_Spectrogram_subj' s{1},'.mat']);
+        dataIn.baseLineMeans = stimData.data.baseLineMeans;        
+    end
+    data = getAvgSpectrogram(dataIn);
+    save([savePath, lockType, '_Spectrogram_subj' s{1}],'data');
+    
+    fprintf('epoching spectrograms completed for subjects %s \n',s{1})
 end
 
+%% group lpc data across subjects
+
+opts                = [];
+opts.subjects   = {'16b','18','24','28'};
+opts.hemId      = {'l','l','l', 'l'};
+opts.lockType  = 'RT';
+
+data = groupLPCSpectrogramData(opts);
+dataPath1 = '../Results/Spectral_Data/group/';
+dataPath2 =[ '~/Google Drive/Research/ECoG Manuscript/data/'];
+fileName = [lockType 'GroupSpectrumData'];
+
+save([dataPath1 fileName],'data')
+save([dataPath2 fileName],'data')
 

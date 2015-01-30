@@ -25,12 +25,14 @@ nTimeP = size(dataMat,3);
 nTrials = numel(epochSampleMarkers);
 epochLength = epochLimits(2)-epochLimits(1)+1;
 
-out = zeros(nChans,nFreqs,nTrials,epochLength);
+out = nan(nChans,nFreqs,nTrials,epochLength);
 
 for iTrial = 1:nTrials
 	samps = (epochSampleMarkers(iTrial)+epochLimits(1)):...
 		(epochSampleMarkers(iTrial)+epochLimits(2));
-	out(:,:,iTrial,:) = dataMat(:,:,samps);
+	if all(~isnan(samps))
+		out(:,:,iTrial,:) = dataMat(:,:,samps);
+	end
 end
 
 return
