@@ -96,8 +96,9 @@ end
 erp = erp(:,:,trialSamps); data.erp = erp;
 
 % Separate trials based on condition
-data.Hits = data.behavior.hits	 & data.goodTrials;
-data.CRs = data.behavior.cr & data.goodTrials;
+%data.Hits = data.behavior.hits	 & data.goodTrials;
+data.Hits = data.behavior.HChits	 & data.goodTrials;
+data.CRs = data.behavior.HCcr       & data.goodTrials;
 
 % separate trials based on median RT
 RTedgesC1 = [0,median(data.allRTs(data.Hits)),max(data.allRTs(data.Hits))+0.1];

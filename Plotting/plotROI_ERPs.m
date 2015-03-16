@@ -24,6 +24,7 @@ if ~strcmp(type,'erp'), extStr = [band extStr];end
 
 %% plot ROI differences
 X = cell(numel(rois),1);
+X2 =cell(numel(rois),1);
 for r = 1:numel(rois)
     roistr = rois{r};
     
@@ -34,6 +35,7 @@ for r = 1:numel(rois)
             for ii=1:numel(subjs)
                 chans = chIdx.(roistr)&(data.subjChans'==subjs(ii));
                 X{r}(ii,:) = nanmean(data.(comparisonType)(chans,:));
+                X2{r}(ii,:) = nanmean(data.BinZStat(chans,:));
             end
     end
 end

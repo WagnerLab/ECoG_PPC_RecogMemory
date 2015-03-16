@@ -12,7 +12,11 @@ z = zeros(1,nTest);
 
 for t = 1:nTest
     [p(t),~,s] = ranksum(X(:,t),Y(:,t));
-    z(t) = s.zval;
+    try
+        z(t) = s.zval;
+    catch
+        keyboard
+    end
 end
 
 

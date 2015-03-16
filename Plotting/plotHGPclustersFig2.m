@@ -49,6 +49,8 @@ chanNums    = find(clusterSet1.chans);
 %temporary hack for channel that doesn't appear
 chanLocs(13,:) = chanLocs(13,:)*1.1;
 
+figW = 800;
+figH = 600;
 if 0
     f(3) = figure(3); clf;
     figW = 800;
@@ -232,7 +234,7 @@ if 0
     print(gcf,'-dtiff',['-r' num2str(opts.resolution)],[opts.plotPath filename])
 end
 %% time courses
-if 0
+if 1
     f = figure(4); clf;
     figW = 1000;
     set(gcf,'position',[-1000 200,figW,figH],'PaperPositionMode','auto','color','w')
@@ -253,7 +255,7 @@ if 0
     for ii = 1:2
         CLChans{ii}=union(clusterSet1.subCLChans{ii},clusterSet2.subCLChans{ii});
     end
-    
+    %unique(data1.subjChans(CLChans{1}))
     smoother    = opts.smoother;
     smootherSpan= opts.smootherSpan;
     

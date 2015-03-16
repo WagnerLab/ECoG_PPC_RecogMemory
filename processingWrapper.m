@@ -3,7 +3,7 @@
 %% preprocess data
 addpath PreProcessing/
 addpath lib/
-for s ={'16b','18','24','28'}
+for s ={'30'};%{'16b','18','24','28'}
     preProcessRawData(s{1},'SS2')
 end
 
@@ -12,20 +12,21 @@ addpath PreProcessing/
 addpath lib/
 %dateStr = '27-May-2013';
 %subjects = {'16b','18','24','28'};
-dateStr = '17-Jun-2013';
-subjects = {'17b','19','29'};
+%dateStr = '17-Jun-2013';
+subjects = {'30'};
+%subjects = {'17b','19','29'};
 %reference = 'origCAR'; nRefChans = 0;
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 dataPath = '../Results/';
 for s = subjects
-    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' dateStr '.mat']);
+    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass.mat']);
     if strcmp(reference,'nonLPCleasL1TvalCh')
-        dataIn.data.refInfoFile = [dataPath 'ERP_Data/subj' s{1} '/ERPsstimLocksubAmporigCAR0' dateStr '.mat'];
+        dataIn.data.refInfoFile = [dataPath 'ERP_Data/subj' s{1} '/ERPsstimLocksubAmporigCAR0.mat'];
         data2=load(dataIn.data.refInfoFile);
         dataIn.data.RefChanTotalTstat =data2.data.chanTotalTstat; clear data2;
     end
     data = reReferenceData(dataIn.data,reference,nRefChans);
-    save([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(data.nRefChans) dateStr],'data')
+    save([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(data.nRefChans)],'data')
 end
 
 %% calc ERPs
@@ -33,8 +34,9 @@ addpath PreProcessing/
 addpath Analysis/
 addpath lib/
 
-dateStr = '27-May-2013';
-subjects = {'16b','18','24','28'};
+%dateStr = '27-May-2013';
+%subjects = {'16b','18','24','28'};
+subjects = {'30'};
 %dateStr = '17-Jun-2013';
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
@@ -45,7 +47,7 @@ dataPath = '../Results/';
 analysisType = 'Amp';%{'Amp','Power', 'logPower'};
 baselineType = 'sub';%{'rel','sub'}
 for s = subjects
-    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
+    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans)]);
     dataIn.data.lockType = lockType;
     dataIn.data.analysisType = analysisType;
     dataIn.data.baselineType = baselineType;
@@ -126,18 +128,18 @@ end
 
 addpath PreProcessing/
 
-dateStr = '27-May-2013';
-subjects = {'16b'};
+%dateStr = '27-May-2013';
+subjects = {'30'};
 %subjects = {'16b','18','24','28'};
 %dateStr = '17-Jun-2013';
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 dataPath = '../Results/';
 for s = subjects
-    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
-    for band = {'delta'}%{'delta','theta','alpha','beta','lgam','hgam','bb'};
+    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) ]);
+    for band = {'hgam'};%{'theta','alpha','beta','lgam','hgam','bb'};
         data = dataDecompose(dataIn.data,band{1});
-        save([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1} reference num2str(nRefChans) dateStr '.mat'],'data')
+        save([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1} reference num2str(nRefChans) '.mat'],'data')
     end
 end
 
@@ -145,8 +147,9 @@ end
 
 addpath Analysis/
 
-dateStr = '27-May-2013';
-subjects = {'16b','18','24','28'};
+%dateStr = '27-May-2013';
+%subjects = {'16b','18','24','28'};
+subjects = {'30'};
 %dateStr = '17-Jun-2013';
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
@@ -155,8 +158,9 @@ dataPath = '../Results/';
 analysisType = 'logPower';%{'Amp','Power', 'logPower'};
 baselineType = 'sub';%{'rel','sub'}
 for s = subjects
-    for band = {'delta','theta','alpha','beta','lgam','hgam','bb'};
-        dataIn = load([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1}  reference num2str(nRefChans) dateStr '.mat']);
+    for band = {'hgam'}%{'delta','theta','alpha','beta','lgam','hgam','bb'};
+        %dataIn = load([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1}  reference num2str(nRefChans) dateStr '.mat']);
+        dataIn = load([dataPath 'Spectral_Data/subj' s{1} '/BandPassedSignals/BandPass' band{1}  reference num2str(nRefChans)  '.mat']);
         dataIn.data.lockType = lockType;
         dataIn.data.analysisType = analysisType;
         dataIn.data.baselineType = baselineType;
@@ -178,15 +182,15 @@ for s = subjects
 end
 
 %% plot ersps
-subjects = {'16b','18','24','28'};
+subjects = {'30'};
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
-
+addpath Plotting/
 dataPath = '../Results/';
 
 opts = [];
 opts.plotPath = [dataPath 'Plots/Spectral/'];
-opts.lockType = 'RT';
+opts.lockType = 'stim';
 opts.baselineType = 'sub';
 opts.analysisType = 'logPower';
 opts.type = 'power';
@@ -205,23 +209,24 @@ end
 addpath Analysis/
 addpath lib/
 
-bands = {'erp','hgam','delta','theta','alpha','beta','lgam'};
+bands = {'hgam'};%{'erp','hgam','delta','theta','alpha','beta','lgam','hgam'};
 
 opts = [];
 opts.hems = 'all';
 opts.lockType = 'RT';
 opts.reference = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-opts.subjects       = {'16b','18','24','28','17b','19', '29'};
-opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
+opts.subjects       = {'16b','18','24','28','30','17b','19', '29'};
+opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'l','r'  ,'r' , 'r'};
 
 dataPath = '../Results/';
-if strcmp(opts.type,'erp')
-    dataPath = [dataPath 'ERP_Data/group/'];
-else
-    dataPath = [dataPath 'Spectral_Data/group/'];
-end
+
 for ba = 1:numel(bands)
     opts.type   = bands{ba};
+    if strcmp(opts.type,'erp')
+        dataPath = [dataPath 'ERP_Data/group/'];
+    else
+        dataPath = [dataPath 'Spectral_Data/group/'];
+    end
     data        = groupLPCData(opts);
     fileName    = [opts.hems data.prefix 'Group' data.extension];
     
@@ -353,21 +358,24 @@ end
 
 %% plot roi level data
 
+addpath Plotting
+addpath lib
+
 opts                = [];
 opts.hems           = 'l';
-opts.lockType       = 'RT';
+opts.lockType       = 'stim';
 opts.reference      = 'nonLPCleasL1TvalCh';
 opts.nRefChans      = 10;
 opts.type           = 'power';
 opts.band           = 'hgam';
 opts.smoother       = 'loess';
-opts.acrossWhat     = 'Subjects';
+opts.acrossWhat     = 'Channels';
 opts.smootherSpan   = 0.15;
 opts.yLimits        = [-0.6 1.5];
 opts.aRatio         = [500 300];
 
-opts.subjects       = {'16b','18','24','28','17b','19', '29'};
-opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
+opts.subjects       = {'16b','18','24','28','30','17b','19', '29'};
+opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'l','r'  ,'r' , 'r'};
 
 opts.mainPath = '../Results/' ;
 if strcmp(opts.type,'erp')
@@ -543,8 +551,8 @@ close all
 opts                = [];
 opts.hems            = 'l'; opts.hemNum=1;
 opts.ROIs           = [1 2];
-opts.nClusters      = 4;
-opts.lockType       = 'stim';
+opts.nClusters      = 3;
+opts.lockType       = 'RT';
 opts.type           = 'power';
 opts.band           = 'hgam';
 opts.dtype          = 'ZStat';
@@ -655,51 +663,56 @@ clearvars; close all;
 addpath Classification/
 addpath lib/
 
-opts                = [];
-opts.lockType       = 'RT';
-opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-%opts.dataType       = 'erp'; opts.bands          = {''};
-opts.dataType       = 'power'; opts.bands          = {'hgam'};%{'delta','theta','alpha','beta','lgam','hgam'};
-%opts.dataType       = 'power'; opts.bands          = {'erp','delta','theta','alpha','beta','lgam','hgam'};
-opts.toolboxNum     = 1;
-
-% feauture settings
-% timeType distinguishes between decoding individual samples, or taking
-% time  bins
-% options are {'','Bin'};
-opts.timeType       = 'Bin';
-% channelGroupingType makes the distinction between decoding between channels, rois or
-% all channels within LPC
-% options are {'channel','ROI','IPS-SPL','all'};
-opts.channelGroupingType      = 'ROI';
-% timeFeatures distinguishes between takingv the whole trial or taking a
-% window of time
-% options are {'window','trial'};
-opts.timeFeatures   = 'window';
-
-switch opts.lockType
-    case 'RT'
-        opts.timeLims   = [-0.8 0.2];
-        opts.timeStr     = 'n800msTo200ms';
-%         opts.timeLims   = [-0.6 0.1];
-%         opts.timeStr     = 'n600msTo100ms';
-    case 'stim'
-        %opts.timeLims   = [-0.2 1];
-        %opts.timeStr     = 'n200msTo1000ms';
-        opts.timeLims   = [0 1];
-        opts.timeStr     = '0msTo1000ms';
-end
+LT  = {'stim','RT'};
+GT = {'ROI','channel','IPS-SPL'};
+for gt = 1:3
+    for lt = 1:2;
+        opts                = [];
+        opts.lockType       = LT{lt};
+        opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
+        %opts.dataType       = 'erp'; opts.bands          = {''};
+        opts.dataType       = 'power'; opts.bands          = {'hgam'};%{'delta','theta','alpha','beta','lgam','hgam'};
+        %opts.dataType       = 'power'; opts.bands          = {'erp','delta','theta','alpha','beta','lgam','hgam'};
+        opts.toolboxNum     = 1;
         
-S = ClassificationWrapper(opts);
-
-savePath = ['../Results/Classification/group/' opts.dataType ... 
-    '/' opts.channelGroupingType '/'];
-if ~exist(savePath,'dir'),mkdir(savePath), end
-
-fileName = ['allSubjsClassXVB' opts.lockType 'Lock' opts.timeStr opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
-    opts.timeType '_gT' opts.channelGroupingType '_Solver' S.extStr];
-save([savePath fileName],'S')
-
+        % feauture settings
+        % timeType distinguishes between decoding individual samples, or taking
+        % time  bins
+        % options are {'','Bin'};
+        opts.timeType       = 'Bin';
+        % channelGroupingType makes the distinction between decoding between channels, rois or
+        % all channels within LPC
+        % options are {'channel','ROI','IPS-SPL','all'};
+        opts.channelGroupingType      = GT{gt};
+        % timeFeatures distinguishes between takingv the whole trial or taking a
+        % window of time
+        % options are {'window','trial'};
+        opts.timeFeatures   = 'window';
+        
+        switch opts.lockType
+            case 'RT'
+                opts.timeLims   = [-0.8 0.2];
+                opts.timeStr     = 'n800msTo200ms';
+                %         opts.timeLims   = [-0.6 0.1];
+                %         opts.timeStr     = 'n600msTo100ms';
+            case 'stim'
+                %opts.timeLims   = [-0.2 1];
+                %opts.timeStr     = 'n200msTo1000ms';
+                opts.timeLims   = [0 1];
+                opts.timeStr     = '0msTo1000ms';
+        end
+        
+        S = ClassificationWrapper(opts);
+        
+        savePath = ['../Results/Classification/group/' opts.dataType ...
+            '/' opts.channelGroupingType '/'];
+        if ~exist(savePath,'dir'),mkdir(savePath), end
+        
+        fileName = ['allSubjsClassXVB' opts.lockType 'Lock' opts.timeStr opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
+            opts.timeType '_gT' opts.channelGroupingType '_Solver' S.extStr];
+        save([savePath fileName],'S')
+    end
+end
 %% summarize performance
 
 addpath Classification/
@@ -721,8 +734,8 @@ switch opts.lockType
     case 'RT'
         opts.timeLims   = [-0.8 0.2];
         opts.timeStr     = 'n800msTo200ms';
-%         opts.timeLims   = [-0.6 0.1];
-%         opts.timeStr     = 'n600msTo100ms';
+        %         opts.timeLims   = [-0.6 0.1];
+        %         opts.timeStr     = 'n600msTo100ms';
     case 'stim'
         %opts.timeLims   = [-0.2 1];
         %opts.timeStr     = 'n200msTo1000ms';
@@ -880,15 +893,16 @@ save([savePath fileName])
 addpath PreProcessing/
 addpath Analysis/
 
-dateStr = '27-May-2013';
+%dateStr = '27-May-2013';
 %subjects = {'16b'};
-subjects = {'16b','18','24','28'};
+subjects = {'30'};
 %dateStr = '17-Jun-2013';
 %subjects = {'17b','19','29'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 dataPath = '../Results/';
 for s = subjects
-    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
+   % dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
+    dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans)]);
     data=spectrogramWrapper(dataIn.data);
     
     save([dataPath 'Spectral_Data/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data')
@@ -899,15 +913,16 @@ addpath PreProcessing/
 addpath Analysis/
 addpath Lib/
 
-subjects = {'16b','18','24','28'};
+%subjects = {'16b','18','24','28'};
+subjects = {'30'};
 %subjects = {'17b','19','29'};
-lockType = 'RT';
+lockType = 'stim';
 dataPath = '../Results/Spectral_Data/';
 
-for s = subjects        
+for s = subjects
     fprintf('epoching spectrograms for subjects %s \n',s{1})
     
-    dataIn=load([dataPath '/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');    
+    dataIn=load([dataPath '/subj' s{1} '/SpectrogramData_subj' s{1} '.mat'],'data');
     dataIn=dataIn.data;
     dataIn.lockType = lockType;
     
@@ -915,10 +930,9 @@ for s = subjects
     if ~exist(savePath,'dir')
         mkdir(savePath);
     end
-    
     if strcmp(lockType,'RT')
         stimData = load([savePath,'stim_Spectrogram_subj' s{1},'.mat']);
-        dataIn.baseLineMeans = stimData.data.baseLineMeans;        
+        dataIn.baseLineMeans = stimData.data.baseLineMeans;
     end
     data = getAvgSpectrogram(dataIn);
     save([savePath, lockType, '_Spectrogram_subj' s{1}],'data');

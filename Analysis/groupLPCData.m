@@ -45,12 +45,6 @@ data.ERP            = [];
 data.LPCchanId      = [];
 data.ROIid          = []; data.ROIs = {'IPS','SPL','AG'};
 data.subROIid       = []; data.subROIs = {'pIPS','aIPS','pSPL','aSPL'};
-data.maxNumBlocks   = 4;
-data.dP_Block       = nan(nSubjs,data.maxNumBlocks);
-data.HR_Block       = nan(nSubjs,data.maxNumBlocks);
-data.FAR_Block      = nan(nSubjs,data.maxNumBlocks);
-data.hRT_Block      = nan(nSubjs,data.maxNumBlocks);
-data.crsRT_Block    = nan(nSubjs,data.maxNumBlocks);
 
 for s = 1:nSubjs
     
@@ -72,36 +66,26 @@ for s = 1:nSubjs
     data.ROIid              = [data.ROIid; ROIid'];
     data.subROIid           = [data.subROIid; subROIid'];
     
+    % get LPC channel data
     data.ERP{s}             = squeeze(dataIn.data.erp(dataIn.data.chanInfo.LPC,:,:));  
-    data.Hits{s}            = dataIn.data.Hits;
-    data.Miss{s}            = dataIn.data.behavior.miss & dataIn.data.goodTrials;
-    data.CRs{s}             = dataIn.data.CRs;
-    data.FA{s}              = dataIn.data.behavior.fa   & dataIn.data.goodTrials;
+    
+    %
     data.RTtype{s}          = dataIn.data.RTtype;
     data.RTs{s}             = dataIn.data.allRTs;
     data.dPrime(s)          = dataIn.data.behavior.dPrime;
     
-    %by block
-    data.nSubjBlocks(s) = dataIn.data.nBlocks;
-    data.blockIds{s}    = zeros(sum(dataIn.data.nevents),1);
-    endIds              = cumsum(dataIn.data.nevents);
-    startIds            = endIds-dataIn.data.nevents+1;
-    for bl = 1:data.nSubjBlocks(s)
-        ids = startIds(bl):endIds(bl);
-        data.blockIds{s}(ids) = bl;
-        h = dataIn.data.behavior.hits(ids); cr = dataIn.data.behavior.cr(ids);
-        m = dataIn.data.behavior.miss(ids); fa = dataIn.data.behavior.fa(ids);
-        rts  = data.RTs{s}(ids);
-        nH = sum(h);
-        nM = sum(m);
-        nFA = sum(fa);
-        nCR = sum(cr);
-        data.dP_Block(s,bl) = calc_dPrime(nH,nM,nFA,nCR);
-        data.HR_Block(s,bl) = nH/(nH+nM);
-        data.FAR_Block(s,bl) = nFA/(nCR+nFA);
-        data.hRT_Block(s,bl) = median(rts(h==1));
-        data.crsRT_Block(s,bl) = median(rts(cr==1));
-    end
+    % get trial conditions
+    nTrials                  = sum(dataIn.data.nevents);
+    goodTrials              = true(nTrials,1);
+    temp = subjExptInfo(subjects{s},'SS2',reference);
+    trialsToExclude     = temp.badtrials;
+    goodTrials(trialsToExclude) = false;
+    
+    data.Hits{s}           = dataIn.data.behavior.HChits    & goodTrials;
+    data.Miss{s}          = dataIn.data.behavior.miss       & goodTrials;
+    data.CRs{s}           = dataIn.data.behavior.HCcr   & goodTrials;
+    data.FA{s}             = dataIn.data.behavior.fa        & goodTrials;
+
 end
 
 nChans = numel(data.subjChans);
@@ -119,12 +103,6 @@ data.sldWin         = data.winSize;
 [data.BinSamps  data.Bins] = getBinSamps(data.winSize,data.sldWin,data.trialTime);
 data.nBins          = size(data.Bins,1);
 
-% big time bin info
-data.BigWinSize = 0.2; % in seconds
-data.sldBigWin = data.BigWinSize/2;
-[data.BinBinSamps  data.BigBins] = getBinSamps(data.BigWinSize,data.sldBigWin,data.trialTime);
-data.nBigBins = size(data.BigBins,1);
-
 % pre allocation
 fields = {'ZStat','PValZ','mHits','mCRs','zHits','zCRs','cHits','cCRs','ZcHits','ZcCRs','ZcStat'};
 
@@ -137,34 +115,18 @@ for f = fields2
     data.(f{1}) = zeros(nChans,data.nBins);
 end
 
-fields2 = strcat('BigBin',fields);
-for f = fields2
-    data.(f{1}) = zeros(nChans,data.nBigBins);
-end
-
-fields2 = strcat('BinBlock',fields);
-for f = fields2
-    data.(f{1}) = nan(nChans,data.nBins,data.maxNumBlocks);
-end
-
-data.binErp = [];
-ch = 1;
-
 data.BinERP     = cell(nSubjs,1);
-data.BigBinERP  = cell(nSubjs,1);
-
+ch = 1;
 for s = 1:nSubjs
     H               = data.Hits{s};    
     CRs             = data.CRs{s};      
     RTs             = data.RTs{s};
     
     nTrials         = numel(H);
-    nSubjChans      = data.nSubjLPCchans(s);
+    nSubjChans      = data.nSubjLPCchans(s);    
+    data.BinERP{s}      = nan(nSubjChans,nTrials,data.nBins);    
     
-    data.BinERP{s}      = nan(nSubjChans,nTrials,data.nBins);
-    data.BigBinERP{s}   = nan(nSubjChans,nTrials,data.nBigBins);
-    
-    for Sch = 1: data.nSubjLPCchans(s)        
+   for Sch = 1: data.nSubjLPCchans(s)        
         
         % original sampled data
         Z       = squeeze(data.ERP{s}(Sch,:,:));
@@ -175,19 +137,6 @@ for s = 1:nSubjs
         data.BinERP{s}(Sch,:,:) = binERP;
         data    = getEffectScores(binERP,RTs,H,CRs,data,ch,1,'Bin');
         
-        % Big bins         
-        BigBinERP   = binTrials(Z,data.BinBinSamps);        
-        data.BigBinERP{s}(Sch,:,:) = BigBinERP;
-        data        = getEffectScores(BigBinERP,RTs,H,CRs,data,ch,1,'BigBin');
-        
-        %separate data by block
-        Z = binERP;
-        for bl = 1:data.nSubjBlocks(s)
-            ids = data.blockIds{s}==bl;
-            
-            H2 = H&ids; CRs2 = CRs&ids;
-            data    = getEffectScores(Z,RTs,H2,CRs2,data,ch,bl,'BinBlock');                        
-        end
         ch = ch + 1;
     end
 end
@@ -196,25 +145,25 @@ end
 data.hemChanId  = ismember(data.subjChans,find(strcmp(opts.hemId,'r')))'+1;
 
 % obtain group level roi main effects
-data.mainEfpValROIs = zeros(3,data.nBigBins,2);
+data.mainEfpValROIs = zeros(3,data.nBins,2);
 for hem = 1:2
     for r   = 1: numel(data.ROIs)
         chans = (data.ROIid == r) & (data.hemChanId == hem);
-        [~,data.mainEfpValROIs(r,:,hem)] = ttest(data.BigBinZStat(chans,:));
+        [~,data.mainEfpValROIs(r,:,hem)] = ttest(data.BinZStat(chans,:));
     end
 end
 
 % obtain group level roi comparison statistics
 % three comparsions:
 data.ROIcontrasts       =  {'AG', 'IPS' ;'AG' ,'SPL';'IPS','SPL'};
-data.contrEfpValROIs    = zeros(3,data.nBigBins,2);
+data.contrEfpValROIs    = zeros(3,data.nBins,2);
 for hem = 1:2
     for rc = 1:size(data.ROIcontrasts,1)        
         r1 = find(strcmp(data.ROIcontrasts(rc,1),data.ROIs));
         r2 = find(strcmp(data.ROIcontrasts(rc,2),data.ROIs));
         chans1 = (data.ROIid == r1) & (data.hemChanId == hem);
         chans2 = (data.ROIid == r2) & (data.hemChanId == hem);
-        [~,data.contrEfpValROIs(rc,:,hem)] = ttest2(data.BigBinZStat(chans1,:),data.BigBinZStat(chans2,:));
+        [~,data.contrEfpValROIs(rc,:,hem)] = ttest2(data.BinZStat(chans1,:),data.BinZStat(chans2,:));
     end
 end
 

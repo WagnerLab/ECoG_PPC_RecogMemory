@@ -121,11 +121,20 @@ switch subj
             S.blocklist = {'JT2_09', 'JT2_11', 'JT2_13', 'JT2_15'};      
             S.badtrials = [4 23 34 44 76 77 91 2 3 6 93 144];
         end
+    case {'30','RR'}
+        S.subjNum = '30';
+        S.subjName = 'RR';
+        if strcmp(expt,'SS2')
+            S.blocklist = {'RR_48', 'RR_50', 'RR_52', 'RR_54','RR_56','RR_106','RR_108'};
+            S.badtrials = [ 1    14    24    39    41    45    78    81   131   133   137   172   194 204 233   240   260   268   273];
+            %S.badtrials = [ 1    14    24    39    41    45    78    81   131   133   137    172   194  ];
+        end
     otherwise
         error('subject not found.')
 end
 
 S.expt = expt;
-S.DataPath = ['/biac4/wagner/biac3/wagner7/ecog/subj' S.subjNum '/ecog/' ...
-    S.expt '/'];
+% S.DataPath = ['/biac4/wagner/biac3/wagner7/ecog/subj' S.subjNum '/ecog/' ...
+%     S.expt '/'];
+S.DataPath = ['/Volumes/group/awagner/biac3/wagner7/ecog/subj' S.subjNum '/ecog/' S.expt '/'];
 

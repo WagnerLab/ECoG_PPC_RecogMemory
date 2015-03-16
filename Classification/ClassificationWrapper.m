@@ -12,7 +12,7 @@ function S = ClassificationWrapper(opts)
 %% load data
 data        = [];
 dataPath    = '~/Documents/ECOG/Results/';
-nSubjs      = 7;
+nSubjs      = 8;
 
 switch opts.dataType
     case 'erp'

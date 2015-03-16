@@ -23,8 +23,8 @@ opts.absLevel       = 1;
 opts.Pthr           = 0.01;
 opts.resolution     = 600;
 
-opts.subjects       = {'16b','18','24','28','17b','19', '29'};
-opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
+opts.subjects       = {'16b','18','24','28','30','17b','19', '29'};
+opts.hemId          = {'l'  ,'l' ,'l' ,'l' , 'l', 'r'  ,'r' , 'r'};
 
 opts.measType       = 'm';     % {'m','z','c','Zc'}
 opts.comparisonType = 'ZStat'; % {ZStat,ZcStat}
@@ -73,7 +73,8 @@ opts.resolution     = 300;
 %% Figure 2: clusters
 
 addpath Plotting/
-addpath Analysis//
+addpath Analysis/
+addpath lib/
 close all
 
 opts                = [];
@@ -100,7 +101,8 @@ load([dataPath pre 'RT' post]);
 data2       = data;
 
 plotHGPclustersFig2(data1,clusterSet1,data2,clusterSet2,opts)
-
+%
+%
 %% supplement for cluster 3,4
 ClusterSet = cell(4,1);
 load([dataPath 'clusters/K3Clusters' pre 'stim' post]);

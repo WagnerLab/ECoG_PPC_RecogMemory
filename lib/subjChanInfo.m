@@ -254,10 +254,35 @@ elseif strcmp(subj,'29') || strcmp(subj,'JT')
     
     rois.pSPL = [42:44 35 36];
     rois.aSPL = [34];
+
+elseif strcmp(subj,'30')|| strcmp(subj,'RR')
+   
+    rois.subjnum = subj;
+    rois.allChans = 1:128;
+    rois.refChannel = 82;
+    rois.badChannels = [62:64, 106 107, 4 5 6, 20 22, 57:61, 33 34, 45, 46, 51, 52,53];
+    rois.noisyChannels = [33 42 45 47 48 57 85];
+    rois.surfaceChannels = rois.allChans;
+    rois.goodChannels = setdiff(rois.allChans,[rois.badChannels,rois.refChannel,rois.noisyChannels]);
+    
+    rois.pIPS = [126 127];
+    rois.amIPS = [103 111 119];
+    rois.latIPS = [102 94];
+    rois.IPS = intersect(rois.goodChannels,[rois.pIPS rois.amIPS rois.latIPS]);
+    
+    rois.pSPL = [120 128];
+    rois.aSPL = [95 104 112];
+    rois.SPL = intersect(rois.goodChannels,[95 104 112 120 128]);    
+    rois.AG = intersect(rois.goodChannels,[110 118 109 117 108 101]);
+    rois.TPJ = intersect(rois.goodChannels,[91 92 99 100]);
+    rois.SMG = intersect(rois.goodChannels,[84 85 93]);
+    rois.amb = [];
+            
 end
+
 rois.aIPS = [rois.amIPS, rois.latIPS];
 rois.CARChannels = setdiff(rois.surfaceChannels,[rois.badChannels,rois.noisyChannels,rois.refChannel]);
 rois.LPC = [rois.IPS rois.SPL rois.AG];
 rois.other = setdiff(rois.goodChannels,rois.LPC);
-
+    
 return

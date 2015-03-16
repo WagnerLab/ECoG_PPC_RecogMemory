@@ -22,6 +22,18 @@ if ~isfield(dataStruct,'yLimits')
 else
     yLimits         = dataStruct.yLimits;
 end
+
+if ~isfield(dataStruct,'yTick')
+    yTicks = [0 0.75 1.5];
+    yTickLabel = {'0','','1.5'};
+else
+    yTicks = dataStruct.yTick;
+    yTickLabel = {};
+    for ii =1:2:numel(yTicks)
+        yTickLabel{ii} = num2str(yTicks(ii));
+        yTickLabel{ii+1} = '';
+    end
+end
 yRefLims    = [yLimits(1)*0.3 yLimits(2)*0.3];    
 timeTicks   	= {-0.2:0.2:1, -1:0.2:0.2};
 
@@ -61,8 +73,8 @@ set(yy(9),'YData',[yRefLims],'color',0.3*ones(3,1))
 set(yy(10),'color',0.3*ones(3,1))
 
 set(gca,'fontsize',14,'fontWeight','normal')
-set(gca,'ytick',[0 0.75 1.5])
-set(gca,'yticklabel',{'0','','1.5'})
+set(gca,'ytick',yTicks)
+set(gca,'yticklabel',yTickLabel)
 set(gca,'xtick',timeTicks{1},'XtickLabel',[])
 
 % first bar plot
@@ -91,7 +103,7 @@ set(yy(9),'YData',[yRefLims],'color',0.3*ones(3,1))
 set(yy(10),'color',0.3*ones(3,1))
 
 set(gca,'fontsize',14,'fontWeight','normal')
-set(gca,'ytick',[0 0.75 1.5])
-set(gca,'yticklabel',{'0','','1.5'})
+set(gca,'ytick',yTicks)
+set(gca,'yticklabel',yTickLabel)
 set(gca,'xtick',timeTicks{2},'XtickLabel',[])
 set(gca,'YAXisLocation','right')

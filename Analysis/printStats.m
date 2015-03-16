@@ -2,6 +2,8 @@ function printStats(data,opts,type,center)
 % main statistics from time courses
 
 ROIs        = {'IPS','SPL','AG'};
+type        = 'BinZStat';
+center      = 0;
 
 % number of tests
 mMain           = 1;
@@ -10,7 +12,7 @@ MAIN_alpha      = 0.05/mMain;
 INTER_alpha     = 0.05/mInter;
 
 % time bins of interest
-BOT         = find((data.Bins(:,1) >= opts.timeLims(1)) & (data.Bins(:,2) <= opts.timeLims(2)));
+BOT         = find((data.Bins(:,1) >= opts.time(1)) & (data.Bins(:,2) <= opts.time(2)));
 
 hemChans        = [data.hemChanId==1 data.hemChanId==2];
 hemROIChans     = cell(2,3);
@@ -20,10 +22,10 @@ for ii=1:2;
     end
 end
 
-SubjROIChans      = cell(3,7);
+SubjROIChans      = cell(3,8);
 for ii = 1:3
-    for jj=1:7;
-        SubjROIChans{ii,jj} = data.ROIid.*(data.subjChans==jj) == ii;
+    for jj=1:8;
+        SubjROIChans{ii,jj} = data.ROIid.*(data.subjChans(:)==jj) == ii;
     end
 end
 

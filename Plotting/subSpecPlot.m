@@ -1,7 +1,5 @@
 function ha = subSpecPlot(dataStruct,axesCoords)
 
-
-
 %% set colormap
 colMapFun = @(bot,top,N)([ linspace(top(1),bot(1),N)', ...
     linspace(top(2),bot(2),N)', linspace(top(3),bot(3),N)']);
@@ -14,7 +12,6 @@ nLevels = 50;
 colMap = [colMapFun(col2,col3,nLevels);
                 col2;
                 colMapFun(col1,col2,nLevels)];
-colormap(colMap)
 
 %% set axes location
 raw_tcW = 0.46;
@@ -53,7 +50,11 @@ set(gca,'fontsize',14,'fontWeight','normal')
 set(gca,'xtick',timeTicks{1},'xticklabel',[])
 set(gca,'lineWidth',0.5)
 axis xy
-colormap(colMap)
+colormap(gca,colMap)
+
+if isfield(dataStruct,'ylabel')
+	ylabel(dataStruct.ylabel)
+end
 
 % second spectrogram
 axes(ha(2))
@@ -67,3 +68,4 @@ set(gca,'fontsize',14,'fontWeight','normal')
 set(gca,'xtick',timeTicks{2},'xticklabel',[])
 set(gca,'yAxisLocation','right')
 axis xy
+colormap(gca,colMap)

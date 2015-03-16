@@ -189,7 +189,7 @@ end
 
 %% bar graphs and time courses
 
-if 0
+if 1
     f(5) = figure(5); clf;
     figW = 1200;
     figH = 600;
@@ -315,7 +315,7 @@ end
 
 %% plot AG trace
 
-if 1
+if 0
     f(6) = figure(6); clf;
     figW = 900;
     figH = 300;
@@ -406,7 +406,7 @@ end
 
 %% plot TC for rights
 
-if 1
+if 0
     f(7) = figure(7); clf;
     figW = 900;
     figH = 900;
