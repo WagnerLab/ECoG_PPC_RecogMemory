@@ -6,8 +6,8 @@ type        = 'BinZStat';
 center      = 0;
 
 % number of tests
-mMain          = 10;
-mInter          = 10*3;
+mMain           = 1;
+mInter          = 1*3;
 MAIN_alpha      = 0.05/mMain;
 INTER_alpha     = 0.05/mInter;
 
@@ -41,14 +41,6 @@ for kk = 1:2
     for ii = 1:3
         display([ROIs{ii} ' t test results'])
         ChanMat{ii} = data.(type)(hemROIChans{kk,ii},BOT);
-        ttestPrint(ChanMat{ii},MAIN_alpha,time,center)
-        
-        display([ROIs{ii} ' hits t test results'])
-        ChanMat{ii} = data.BinmHits(hemROIChans{kk,ii},BOT);
-        ttestPrint(ChanMat{ii},MAIN_alpha,time,center)
-        
-        display([ROIs{ii} ' CRs t test results'])
-        ChanMat{ii} = data.BinmCRs(hemROIChans{kk,ii},BOT);
         ttestPrint(ChanMat{ii},MAIN_alpha,time,center)
     end
     % roi interactions
