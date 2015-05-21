@@ -13,9 +13,9 @@ addpath lib/
 %dateStr = '27-May-2013';
 %subjects = {'16b','18','24','28'};
 %dateStr = '17-Jun-2013';
-subjects = {'30'};
+subjects = {'16b'};
 %subjects = {'17b','19','29'};
-%reference = 'origCAR'; nRefChans = 0;
+reference = 'origCAR'; nRefChans = 0;
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 dataPath = '../Results/';
 for s = subjects
@@ -42,7 +42,7 @@ subjects = {'30'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 %reference = 'origCAR'; nRefChans = 0;
 %reference = 'allChCAR'; nRefChans = 0;
-lockType = 'RT'; %{'stim','RT'}
+lockType = 'stim'; %{'stim','RT'}
 dataPath = '../Results/';
 analysisType = 'Amp';%{'Amp','Power', 'logPower'};
 baselineType = 'sub';%{'rel','sub'}
@@ -209,11 +209,13 @@ end
 addpath Analysis/
 addpath lib/
 
-bands = {'hgam'};%{'erp','hgam','delta','theta','alpha','beta','lgam','hgam'};
+bands = {'erp'};%{'erp','hgam','delta','theta','alpha','beta','lgam','hgam'};
 
+LT  = {'stim','RT'};
+for lt = 1:2
 opts = [];
 opts.hems = 'all';
-opts.lockType = 'RT';
+opts.lockType = LT{lt};
 opts.reference = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 opts.subjects       = {'16b','18','24','28','30','17b','19', '29'};
 opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'l','r'  ,'r' , 'r'};
@@ -231,7 +233,8 @@ for ba = 1:numel(bands)
     fileName    = [opts.hems data.prefix 'Group' data.extension];
     
     save([dataPath fileName '.mat'],'data')
-    fprintf('grouping data completed for %s\n',opts.type)
+    fprintf('grouping data completed for %s %s \n',opts.type,opts.lockType)
+end
 end
 
 %% render channels
@@ -240,7 +243,7 @@ close all
 opts                = [];
 opts.mainPath       = '../Results/Plots/Renderings/channels/' ;
 opts.level          = 'subj'; %{'group','subj'}
-opts.cortexType     = 'MNI'; %{'Native','MNI'}
+opts.cortexType     = 'Native'; %{'Native','MNI'}
 opts.chanNumLabel   = false; %{true,false}
 opts.ROIColor       = true; %{true,false}
 opts.ROIColors      = [[0.9 0.2 0.2];[0.1 0.5 0.8];[0.2 0.6 0.3]];
@@ -609,11 +612,12 @@ save([opts.savePath fileName2],'out')
 %% output group data to a csv file and compute stats
 
 addpath Analysis/
+addpath lib/
 clc
 
 opts                = [];
 opts.hems           = 'all';
-opts.lockType       = 'stim';
+opts.lockType       = 'RT';
 opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
 %opts.type           = 'erp'; opts.band = '';
 opts.type           = 'power'; opts.band = 'hgam';
@@ -687,7 +691,7 @@ for gt = 1:3
         % timeFeatures distinguishes between takingv the whole trial or taking a
         % window of time
         % options are {'window','trial'};
-        opts.timeFeatures   = 'window';
+        opts.timeFeatures   = 'trial';
         
         switch opts.lockType
             case 'RT'
@@ -716,44 +720,53 @@ end
 %% summarize performance
 
 addpath Classification/
-
-opts                = [];
-opts.lockType       = 'RT';
-opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
-%opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
-opts.dataType       = 'power'; opts.bands          = {'hgam'};
-%opts.dataType       = 'power'; opts.bands          = {'erp','hgam'};
-%opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
-opts.toolboxNum     = 1;
-opts.timeType       = 'Bin';
-opts.channelGroupingType      = 'ROI';
-opts.timeFeatures   = 'window';
-opts.extStr         = 'liblinearS0';%'NNDTWK5';%
-
-switch opts.lockType
-    case 'RT'
-        opts.timeLims   = [-0.8 0.2];
-        opts.timeStr     = 'n800msTo200ms';
-        %         opts.timeLims   = [-0.6 0.1];
-        %         opts.timeStr     = 'n600msTo100ms';
-    case 'stim'
-        %opts.timeLims   = [-0.2 1];
-        %opts.timeStr     = 'n200msTo1000ms';
-        opts.timeLims   = [0 1];
-        opts.timeStr     = '0msTo1000ms';
+LT  = {'stim','RT'};
+GT = {'channel'};%{'ROI','channel','IPS-SPL'};
+for gt = 1:numel(GT)
+    for lt = 1:numel(LT);
+        
+        try
+        opts                = [];
+        opts.lockType       = LT{lt};
+        opts.reference      = 'nonLPCleasL1TvalCh'; opts.nRefChans = 10;
+        %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha'};
+        opts.dataType       = 'power'; opts.bands          = {'hgam'};
+        %opts.dataType       = 'power'; opts.bands          = {'erp','hgam'};
+        %opts.dataType       = 'power'; opts.bands          = {'delta','theta','alpha','beta','lgam','hgam'};
+        opts.toolboxNum     = 1;
+        opts.timeType       = 'Bin';
+        opts.channelGroupingType      = GT{gt};
+        opts.timeFeatures   = 'trial';
+        opts.extStr         = 'liblinearS0';%'NNDTWK5';%
+        
+        switch opts.lockType
+            case 'RT'
+                opts.timeLims   = [-0.8 0.2];
+                opts.timeStr     = 'n800msTo200ms';
+                %         opts.timeLims   = [-0.6 0.1];
+                %         opts.timeStr     = 'n600msTo100ms';
+            case 'stim'
+                %opts.timeLims   = [-0.2 1];
+                %opts.timeStr     = 'n200msTo1000ms';
+                opts.timeLims   = [0 1];
+                opts.timeStr     = '0msTo1000ms';
+        end
+        
+        dataPath = ['../Results/Classification/group/' opts.dataType ...
+            '/' opts.channelGroupingType '/'];
+        
+        fileName = ['allSubjsClassXVB' opts.lockType 'Lock' opts.timeStr opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
+            opts.timeType '_gT' opts.channelGroupingType '_Solver' opts.extStr];
+        
+        load([dataPath fileName])
+        S = SummaryClassification(S,opts);
+        fileName = ['Sum' fileName];
+        save([dataPath fileName],'S')
+        catch ME
+            keyboard
+        end
+    end
 end
-
-dataPath = ['../Results/Classification/group/' opts.dataType ...
-    '/' opts.channelGroupingType '/'];
-
-fileName = ['allSubjsClassXVB' opts.lockType 'Lock' opts.timeStr opts.dataType cell2mat(opts.bands) '_tF' opts.timeFeatures '_tT' ...
-    opts.timeType '_gT' opts.channelGroupingType '_Solver' opts.extStr];
-
-load([dataPath fileName])
-S = SummaryClassification(S,opts);
-fileName = ['Sum' fileName];
-save([dataPath fileName],'S')
-
 %% plot decoding results
 
 addpath lib/
@@ -901,7 +914,7 @@ subjects = {'30'};
 reference = 'nonLPCleasL1TvalCh'; nRefChans = 10;
 dataPath = '../Results/';
 for s = subjects
-   % dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
+    % dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans) dateStr]);
     dataIn = load([dataPath 'ERP_Data/subj' s{1} '/BandPassedSignals/BandPass' reference num2str(nRefChans)]);
     data=spectrogramWrapper(dataIn.data);
     
@@ -916,7 +929,7 @@ addpath Lib/
 %subjects = {'16b','18','24','28'};
 subjects = {'30'};
 %subjects = {'17b','19','29'};
-lockType = 'stim';
+lockType = 'RT';
 dataPath = '../Results/Spectral_Data/';
 
 for s = subjects
@@ -943,15 +956,14 @@ end
 %% group lpc data across subjects
 
 opts                = [];
-opts.subjects   = {'16b','18','24','28'};
-opts.hemId      = {'l','l','l', 'l'};
+opts.subjects   = {'16b','18','24','28','30'};
+opts.hemId      = {'l','l','l', 'l','l'};
 opts.lockType  = 'RT';
 
 data = groupLPCSpectrogramData(opts);
 dataPath1 = '../Results/Spectral_Data/group/';
 dataPath2 =[ '~/Google Drive/Research/ECoG Manuscript/data/'];
-fileName = [lockType 'GroupSpectrumData'];
+fileName = [opts.lockType 'GroupSpectrumData'];
 
 save([dataPath1 fileName],'data')
 save([dataPath2 fileName],'data')
-

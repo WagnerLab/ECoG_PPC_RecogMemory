@@ -76,8 +76,8 @@ text(0.2,0.5, [' IPS HGP (dB)' ] ,'fontsize',18,'HorizontalAlignment','center', 
     set(gca,'visible','off')
 
 set(ha{5}(1), 'xticklabel',{'','stim','','0.4','','0.8',''})
-set(get(ha{5}(2),'xlabel'),'string','  0.3 to 0.7s','fontSize',13)
-set(get(ha{5}(3),'xlabel'),'string','  -0.5 to -0.3s','fontSize',13)
+set(get(ha{5}(2),'xlabel'),'string','  0.4 to 0.7s','fontSize',13)
+set(get(ha{5}(3),'xlabel'),'string','  -0.5 to -0.2s','fontSize',13)
 set(ha{5}(4), 'xticklabel',{'','-0.8','','-0.4','','resp',''})
 
 axes('position', [ 0.44 0, 0.2 ,0.1])
@@ -115,7 +115,8 @@ dataStruct.time{1}    = dataStim.trialTime;
 dataStruct.time{2}    = dataRT.trialTime;
 dataStruct.barPlotLims{1} = dataStim.trialTime>=0.6     & dataStim.trialTime<=0.9;
 dataStruct.barPlotLims{2} = dataRT.trialTime>=-0.3     & dataRT.trialTime<=0;
-dataStruct.yLimits = [-1.2 2.5];
+dataStruct.yLimits = [-1.2 4];
+dataStruct.yTick   = [0 1.5 3];
 
 ha =[];
 subjs = [1 3 4 5];
@@ -220,8 +221,8 @@ text(0.2,0.5, [' CL1 HGP (dB)' ] ,'fontsize',18,'HorizontalAlignment','center', 
     set(gca,'visible','off')
 
 set(ha{5}(1), 'xticklabel',{'','stim','','0.4','','0.8',''})
-set(get(ha{5}(2),'xlabel'),'string','  0.3 to 0.7s','fontSize',13)
-set(get(ha{5}(3),'xlabel'),'string','  -0.5 to -0.3s','fontSize',13)
+set(get(ha{5}(2),'xlabel'),'string','  0.4 to 0.7s','fontSize',13)
+set(get(ha{5}(3),'xlabel'),'string','  -0.5 to -0.2s','fontSize',13)
 set(ha{5}(4), 'xticklabel',{'','-0.8','','-0.4','','resp',''})
 
 axes('position', [ 0.44 0, 0.2 ,0.1])
@@ -260,8 +261,8 @@ dataStruct.time{1}    = dataStim.trialTime;
 dataStruct.time{2}    = dataRT.trialTime;
 dataStruct.barPlotLims{1} = dataStim.trialTime>=0.6     & dataStim.trialTime<=0.9;
 dataStruct.barPlotLims{2} = dataRT.trialTime>=-0.3     & dataRT.trialTime<=0;
-dataStruct.yLimits = [-2.5 6];
-dataStruct.yTick = [-2 -1 0 1 2 3 4];
+dataStruct.yLimits = [-2.5 7];
+dataStruct.yTick = [-2  0  2  4 6];
 
 ha =[];
 chansToPlot = [1,0,2,3,1];

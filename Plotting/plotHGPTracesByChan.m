@@ -189,7 +189,7 @@ end
 
 %% bar graphs and time courses
 
-if 1
+if 0
     f(5) = figure(5); clf;
     figW = 1200;
     figH = 600;
@@ -398,15 +398,16 @@ if 0
     addpath(cPath)
     addpath([cPath '/Plotting/'])
     
-    filename = 'sFig4_AG-HGP-TC';
+    filename = 'sFig6_AG-HGP-TC';
     plot2svg([filename '.svg'],gcf)
     eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    eval(['!rm ' filename '.svg'])
     cd(cPath)
 end
 
 %% plot TC for rights
 
-if 0
+if 1
     f(7) = figure(7); clf;
     figW = 900;
     figH = 900;
@@ -502,9 +503,10 @@ if 0
     addpath(cPath)
     addpath([cPath '/Plotting/'])
     
-    filename = 'sFig5_Rights-HGP-TC';
+    filename = 'sFig7_Rights-HGP-TC';
     plot2svg([filename '.svg'],gcf)
     eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    eval(['!rm ' filename '.svg'])
     cd(cPath)
 end
 

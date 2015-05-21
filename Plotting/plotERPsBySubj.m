@@ -1,4 +1,4 @@
-function plotERPsByChan(data1,data2, opts) 
+function plotERPsBySubj(data1,data2, opts) 
 inkscapePath='/Applications/Inkscape.app/Contents/Resources/bin/inkscape';
 SupPlotPath = ['~/Google ','Drive/Research/ECoG ','Manuscript/ECoG ', 'Manuscript Figures/supplement/'];
 
@@ -7,14 +7,11 @@ smoother    = opts.smoother;
 smootherSpan= opts.smootherSpan;
 
 rois        = {'IPS','SPL', 'AG'};
-chIdx{1}   = data1.ROIid==1 & hemChans;
-chIdx{2}   = data1.ROIid==2 & hemChans;
-chIdx{3}   = data1.ROIid==3 & hemChans;
+subjs       = find(strcmp(opts.hemId,'l'));
 
-% rights
-chIdx{4}   = data1.ROIid==1 & ~hemChans;
-chIdx{5}   = data1.ROIid==2 & ~hemChans;
-chIdx{6}   = data1.ROIid==3 & ~hemChans;
+for ii=[1 2 3]
+    chIdx{ii}   = data1.ROIid==ii & hemChans;
+end
 
 t{1}   = data1.trialTime;
 t{2}   = data2.trialTime;
@@ -72,15 +69,21 @@ for row = 1:3
         
         axes(ha(cnt));
         
-        X = cell(2,1);
-        X{1} = Xh{colB}(chIdx{row},:);
-        X{2} = Xcr{colB}(chIdx{row},:);
+         X = cell(2,1);
+        XX = [];
+        for ii=1:numel(subjs)
+            chans = chIdx{row}&(data1.subjChans'==subjs(ii));
+            X{1}(ii,:) = nanmean(Xh{colB}(chans,:));
+            X{2}(ii,:) = nanmean(Xcr{colB}(chans,:));
+            XX(ii,:)    = nanmean(Xz{colB}(chans,:));
+        end
+
         hh=plotNTraces(X,t{colB},'oc', smoother, smootherSpan,'mean',yLimits);
         yy=get(gca,'children');
         set(yy(9),'YData',yRefLims,'color',0.3*ones(3,1))
         set(yy(10),'color',0.3*ones(3,1))
         
-        [~,p] = ttest(Xz{colB}(chIdx{row},:));
+       [~,p,~,tt] = ttest(XX);
         sigBins = Bins{colB}(p<opts.Pthr,:);
         hold on;
         for ii = 1:size(sigBins,1)
@@ -128,7 +131,7 @@ cd(SupPlotPath)
 addpath(cPath)
 addpath([cPath '/Plotting/'])
 
-filename = 'sFig11_ERPs-TC';
+filename = 'sFig12_ERPsbySubj-TC';
 plot2svg([filename '.svg'],gcf)
 eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
 eval(['!rm ' filename '.svg'])

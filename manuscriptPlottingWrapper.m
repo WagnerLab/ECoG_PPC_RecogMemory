@@ -13,14 +13,14 @@ opts.type           = 'power';
 opts.band           = 'hgam';
 opts.smoother       = 'loess';
 opts.smootherSpan   = 0.15;
-opts.yLimits        = [-0.6 1.6];
+opts.yLimits        = [-0.6 2];
 opts.timeLims       = [0 1; -1 0.2]; % statistcs evaluation; first row for stim
 opts.aRatio         = [500 300];
 opts.renderType     = 'SmoothCh';%{'SmoothCh','UnSmoothCh', 'SigChans','SignChans'};
 opts.limitDw        = -4;
 opts.limitUp        = 4;
 opts.absLevel       = 1;
-opts.Pthr           = 0.01;
+opts.Pthr           = 0.005;
 opts.resolution     = 600;
 
 opts.subjects       = {'16b','18','24','28','30','17b','19', '29'};
@@ -101,6 +101,45 @@ load([dataPath pre 'RT' post]);
 data2       = data;
 
 plotHGPclustersFig2(data1,clusterSet1,data2,clusterSet2,opts)
+%%
+% get descriptive numbers
+% number of ROI to cluster overlap
+% cluster 1
+chans=find(clusterSet1.chans);
+nOver =sum([chans(clusterSet1.index)==clusterSet1.ROI_ids]);
+nTot = numel(chans);
+fprintf('CL1 #overlap / total = %i / %i \n', nOver,nTot)
+
+% cluster 2
+chans=find(clusterSet2.chans);
+nOver =sum([chans(clusterSet2.index)==clusterSet2.ROI_ids]);
+nTot = numel(chans);
+fprintf('CL2 #overlap / total = %i / %i \n', nOver,nTot)
+
+% Get Unified Clusters
+% get cluster channels
+dType = {'stim','RT'};
+CLChans = cell(2,1);
+for ii = 1:2
+    CLChans{ii}=union(clusterSet1.subCLChans{ii},clusterSet2.subCLChans{ii});
+    fprintf(' # of channels for CL1 and CL2 on %s data \n', dType{ii})
+    disp([numel(clusterSet1.subCLChans{ii}) numel(clusterSet2.subCLChans{ii})])
+end
+
+% number of channels in the resulting aggregated cluster
+for ii = 1:2
+    fprintf('number of channels in cluster # %i = %i \n',ii,numel(CLChans{ii}))
+end
+
+% number of channels per subjects in the resulting clusters
+for ii =1:2
+    fprintf('For Cluster %i \n',ii)
+    for jj=1:5
+        kk= numel(intersect(CLChans{ii},find(data1.subjChans==jj)));
+        fprintf('number of channels for subject %i = %i \n',jj,kk)
+    end
+end
+
 %
 %
 %% supplement for cluster 3,4
@@ -124,10 +163,11 @@ opts.dataType1       = 'power'; opts.bands1        = {'hgam'};
 opts.lockType2       = 'RT';
 opts.dataType2       = 'power'; opts.bands2        = {'hgam'};
 
-opts.subjects       = [1:4]; % left subjects
+opts.subjects       = [1:5]; % left subjects
 opts.ROIs           = [1 2]; % roi 1 and 2, IPS and SPL
 opts.ROIids         = true;  % plot roi colors
-opts.lims = [0.45 0.78];
+opts.ylims = [0.45 0.9];
+opts.xlims = [0.45 0.7];
 
 opts.rendLimits     = [-0.15 0.15];
 opts.resolution     = 400;
@@ -159,6 +199,14 @@ fileName4 = [ opts.dataType1 '/ROI/' 'allSubjsClassXVB' ...
     opts.lockType2 'Lock' opts.timeStr2 opts.dataType1 cell2mat(opts.bands1) '_tF' opts.timeFeatures ...
     '_tT' opts.timeType '_gTROI_Solver' opts.extStr];
 
+fileName5 = [ opts.dataType1 '/IPS-SPL/' 'allSubjsClassXVB' ...
+    opts.lockType1 'Lock' opts.timeStr1 opts.dataType1 cell2mat(opts.bands1) '_tF' opts.timeFeatures ...
+    '_tT' opts.timeType '_gTIPS-SPL_Solver' opts.extStr];
+
+fileName6 = [ opts.dataType1 '/IPS-SPL/' 'allSubjsClassXVB' ...
+    opts.lockType2 'Lock' opts.timeStr2 opts.dataType1 cell2mat(opts.bands1) '_tF' opts.timeFeatures ...
+    '_tT' opts.timeType '_gTIPS-SPL_Solver' opts.extStr];
+
 opts.fileName = fileName1;
 opts.fileName = fileName2;
 load([dataPath fileName1])
@@ -168,12 +216,67 @@ data2 = S; % RTLock by Channel
 load([dataPath fileName3])
 data3 = S; % stimLock by ROI
 load([dataPath fileName4])
-data4 = S; % stimLock by ROI
-
+data4 = S; % RTLock by ROI
+load([dataPath fileName5])
+data5 = S; % stimLock by IPS-SPL
+load([dataPath fileName6])
+data6 = S; % RTLock by IPS-SPL
 
 opts.savePath = '/Users/alexg8/Google Drive/Research/ECoG Manuscript/ECoG Manuscript Figures/Fig3/';
 close all
-plotFigure3(data1,data2,data3,data4,opts)
+%plotFigure3_v2(data1,data2,data3,data4,data5,data6,opts)
+%% decoding statistics in the paper:
+IPSch = data1.ROIid==1 & data1.hemChanId==1;
+SPLch = data1.ROIid==2 & data1.hemChanId==1;
+
+disp('Stim-Locked Data Acc across ROI channels Results')
+[~,p,~,t]=ttest(data1.mBAC(IPSch),0.5);
+fprintf('IPS T-Stat %g, P-Val %g, DF %i \n', t.tstat,p,t.df)
+[~,p,~,t]=ttest(data1.mBAC(SPLch),0.5);
+fprintf('SPL T-Stat %g, P-Val %g, DF %i \n', t.tstat,p,t.df)
+
+disp('RT-Locked Data Acc across ROI channels Results')
+[~,p,~,t]=ttest(data2.mBAC(IPSch),0.5);
+fprintf('IPS T-Stat %g, P-Val %g, DF %i \n', t.tstat,p,t.df)
+[~,p,~,t]=ttest(data2.mBAC(SPLch),0.5);
+fprintf('SPL T-Stat %g, P-Val %g, DF %i \n', t.tstat,p,t.df)
+
+fprintf('\n')
+disp('Stim-Locked Data Acc by ROI Results')
+X = mean(data3.perf,4);
+mX = nanmean(X(1:5,:));
+[~,p,~,t]=ttest(X(1:5,:),0.5);
+
+fprintf(' IPS Mean: %.2g, T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(1), t.tstat(1),p(1),t.df(1))
+fprintf(' SPL Mean: %.2g T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(2), t.tstat(2),p(2),t.df(2))
+fprintf(' AG Mean: %.2g T-Stat %.4g, P-Val %6.2e, DF %i \n',mX(3), t.tstat(3),p(3),t.df(3))
+
+fprintf('\n')
+disp('RT-Locked Data Acc by ROI Results')
+X = mean(data4.perf,4);
+mX = nanmean(X(1:5,:));
+[~,p,~,t]=ttest(X(1:5,:),0.5);
+
+fprintf(' IPS Mean: %.2g, T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(1), t.tstat(1),p(1),t.df(1))
+fprintf(' SPL Mean: %.2g T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(2), t.tstat(2),p(2),t.df(2))
+fprintf(' AG Mean: %.2g T-Stat %.4g, P-Val %6.2e, DF %i \n',mX(3), t.tstat(3),p(3),t.df(3))
+
+fprintf('\n')
+disp('Stim-Locked Data Acc by IPS-SPL Results')
+X = mean(data5.perf,4);
+mX = nanmean(X([1 3 4 5],:));
+[~,p,~,t]=ttest(X([1 3 4 5],:),0.5);
+
+fprintf(' Mean: %.2g, T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(1), t.tstat(1),p(1),t.df(1))
+
+fprintf('\n')
+disp('RT-Locked Data Acc by IPS-SPL Results')
+X = mean(data6.perf,4);
+mX = nanmean(X([1 3 4 5],:));
+[~,p,~,t]=ttest(X([1 3 4 5],:),0.5);
+fprintf(' Mean: %.2g, T-Stat %.3g, P-Val %6.2e, DF %i \n',mX(1), t.tstat(1),p(1),t.df(1))
+
+
 
 %% plot ERP figure
 
@@ -186,10 +289,10 @@ opts                = [];           opts.hem           = 'l';
 opts.nRefChans      = 10;           opts.type           = 'erp';
 opts.smoother       = 'loess';      opts.smootherSpan   = 0.15;
 opts.lockType       = 'stim';       opts.reference      = 'nonLPCleasL1TvalCh';
-opts.Pthr           = 0.01;         opts.timeLims       = [0 1; -1 0.2];
+opts.Pthr           = 0.005;         opts.timeLims       = [0 1; -1 0.2];
 
-opts.subjects       = {'16b','18','24','28','17b','19', '29'};
-opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'r'  ,'r' , 'r'};
+opts.subjects       = {'16b','18','24','28', '30', '17b','19', '29'};
+opts.hemId          = {'l'  ,'l' ,'l' ,'l' ,'l','r'  ,'r' , 'r'};
 
 opts.measType       = 'm';     % {'m','z','c','Zc'}
 opts.comparisonType = 'ZStat'; % {ZStat,ZcStat}
@@ -215,7 +318,9 @@ load([opts.dataPath fileName2]);
 data2            = data;
 clear data; close all
 
-plotERPsByChan(data1,data2, opts)
+%plotERPsByChan(data1,data2, opts)
+plotERPsBySubj(data1,data2, opts)
+%%  Rendering of seizure channels.
 %% Figure XXX: HGP-RT correlation
 
 addpath Plotting/

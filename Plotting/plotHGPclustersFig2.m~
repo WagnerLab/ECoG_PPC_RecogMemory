@@ -57,7 +57,7 @@ chanLocs(13,:) = chanLocs(13,:)*1.1;
 
 figW = 800;
 figH = 600;
-if 0
+if 1
     f(3) = figure(3); clf;
     figW = 800;
     figH = 600;
@@ -239,23 +239,15 @@ if 0
     
     print(gcf,'-dtiff',['-r' num2str(opts.resolution)],[opts.plotPath filename])
     
-end
     if 1
         figure(5); clf; 
         set(gcf,'position',[-800 200,500,500],'PaperPositionMode','auto','color','w')        
         ctmr_gauss_plot(gca,cortex{1},[0 0 0],0,'l');
         el_add(chanLocs(chanNums,:),[0 0 0],15);
         
-         el_add(chanLocs(CLChans{1},:),[0 0 0],30)
-        el_add(chanLocs(CLChans{1},:),ClCol{1},25);
-        
-        el_add(chanLocs(CLChans{2},:),[0 0 0],30)
-        el_add(chanLocs(CLChans{2},:),ClCol{2},25);
-            loc_view(view{1}(1),view{1}(2))
-        set(gca, 'CameraViewAngle',7)
-        
-        print(gcf,'-dtiff',['-r' num2str(opts.resolution)],[opts.plotPath 'clusterUnion'])
+        CLChans{1}
     end
+end
 %% time courses
 if 0
     f = figure(4); clf;

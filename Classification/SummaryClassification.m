@@ -7,13 +7,12 @@ function data = SummaryClassification(data,opts)
 a= 0.49; b = 0.51;
 
 nBoots      = data.classificationParams.nBoots;
-nSubjs      = 7;
+nSubjs      = 8;
 nFeatures   = size(data.X,2)*numel(data.opts.bands);
 
 % load univariate data for reference
-dataPath = '~/Documents/ECOG/Results/ERP_Data/group/';
-fileName = ['allERPsGroup' opts.lockType 'LocksubAmp' ...
-    opts.reference num2str(opts.nRefChans)];
+dataPath = '~/Documents/ECOG/Results/Spectral_Data/group/';
+fileName = ['allERSPshgamGroup' opts.lockType 'LocksublogPowernonLPCleasL1TvalCh10'];
 temp = load([dataPath fileName]);
 
 % channels IDs
@@ -88,7 +87,7 @@ RTsLogitCorrH_correct       = nan(nChans,nWin,nBoots);
 RTsLogitCorrCRs_correct     = nan(nChans,nWin,nBoots);
 
 ChCount = 0;
-for s = 1:nSubjs
+for s =1:nSubjs
     nSubjChans  = sum(data.subjChans==s);
     rts         = log10(data.RTs{s}(data.trials{s}));
     

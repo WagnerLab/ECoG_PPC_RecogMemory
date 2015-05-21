@@ -91,7 +91,7 @@ cd(cPath)
 
 %% renderings
 
-load('../Results/ERP_Data/group/allERPsGroupstimLocksubAmpnonLPCleasL1TvalCh10.mat');
+load('../Results/Spectral_Data/group/allERSPshgamGroupstimLocksublogPowernonLPCleasL1TvalCh10.mat');
 view      = [310,30];
 
 chanLocs    =  data.MNILocs;

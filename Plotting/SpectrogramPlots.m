@@ -84,8 +84,8 @@ dataStruct.col1  = [0.8 0.6 0.2];
 dataStruct.col2  = [0.2 0.6 0.8];
 dataStruct.ylabel = ' p-val < 0.05* ';
 
-pValThr  = 0.15;
-se          = [0 0 0; 1 1 1; 0 0 0];
+pValThr  = 0.05;
+se          = [0 0 0; 0 1 0; 0 0 0];
 % create mask for fdr correction
 f = dataStruct.freqs; maskF = f<=180;
 t1 = dataStruct.time1; maskT1 = t1>0;
@@ -197,8 +197,8 @@ dataStruct.col1  = [0.8 0.6 0.2];
 dataStruct.col2  = [0.2 0.6 0.8];
 dataStruct.ylabel = ' p-val < 0.05* ';
 
-pValThr  = 0.15;
-se          = [0 0 0; 1 1 1; 0 0 0]; % correction cluster kernel.
+pValThr  = 0.05;
+se          = [0 0 0; 0 1 0; 0 0 0]; % correction cluster kernel.
 % create mask for fdr correction
 f = dataStruct.freqs; maskF = f<=180;
 t1 = dataStruct.time1; maskT1 = t1>0;

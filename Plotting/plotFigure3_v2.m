@@ -1,8 +1,9 @@
-function plotFigure3(data1,data2,data3,data4,data5,data6,opts)
+function plotFigure3_v2(data1,data2,data3,data4,data5,data6,opts)
 
 inkscapePath='/Applications/Inkscape.app/Contents/Resources/bin/inkscape';
 SupPlotPath = ['~/Google ','Drive/Research/ECoG ','Manuscript/ECoG ', 'Manuscript Figures/supplement/'];
-fontSize  = 16;
+fontSizeAxis  = 14;
+fontSizeLabels  = 16;
 
 temp = load('../Results/ERP_Data/group/allERPsGroupstimLocksubAmpnonLPCleasL1TvalCh10.mat');
 chanLocs    =  temp.data.MNILocs;
@@ -16,6 +17,9 @@ colors{1}  = [0.9 0.2 0.2];
 colors{2}  = [0.1 0.5 0.8];
 colors{3}   = [0.2 0.6 0.3];
 colors{4}    = 0.1*[1 1 1];
+
+% combination color
+colors{5} = [0.9 0.2 0.9];
 
 hem_str     = {'l','r'};
 view{1}     = [310,30];
@@ -66,21 +70,22 @@ M2(:,2) = data2.sdBAC(chans)/sqrt(nBoot2-1);
 % M2(:,2:3)=quantile(YY(chans,:),[0.025 0.975],2);
 
 %% scatter plot and bar graphs of accuracy
-if 0
+if 1
     % plot M1 vs M2
     f = figure(1); clf;
     figW = 800;
-    figH = 600;
+    figH = 800;
     set(gcf,'position',[-800 200,figW,figH],'PaperPositionMode','auto','color','w')
     ha = tight_subplot(2,2);
     
-    scatterW = 0.5;
-    scatterH = scatterW*figW/figH;
+    
+    scatterW = 0.40;
+    scatterH = 0.42;%scatterW*figW/(figH);
     hBarW    = scatterW;  hBarH = 0.1;
     vBarW    = hBarH;     vBarH = scatterH;
     
     xPos= [0.1]; xPos = [xPos xPos+vBarW+0.01];
-    yPos= [0.15]; yPos = [yPos yPos+hBarH+0.01];
+    yPos= [0.43]; yPos = [yPos yPos+hBarH+0.01];
     
     set(ha(1),'position',[xPos(2) yPos(2) scatterW scatterH]) %scatter plot
     set(ha(2),'position',[xPos(2) yPos(1) hBarW hBarH]) % horizontal bar plot
@@ -93,13 +98,13 @@ if 0
     set(gca,'visible','off')
     
     % axes labels
-    axes('position',[xPos(2),yPos(1)-0.1,hBarW,0.1])
-    text(0.5,0.4,'Stim-Locked Accuracy','fontsize',18,...
+    axes('position',[xPos(2),yPos(1)-0.07,hBarW,0.07])
+    text(0.5,0.4,'Stim-Locked Accuracy','fontsize',fontSizeLabels,...
         'VerticalAlignment','middle','horizontalAlignment','center')
     axis off
     
     axes('position',[xPos(1)-0.1,yPos(2),xPos(1),vBarH])
-    text(0.2,0.5,'Resp-Locked Accuracy','fontsize',18,'rotation',90, ...
+    text(0.2,0.5,'Resp-Locked Accuracy','fontsize',fontSizeLabels,'rotation',90, ...
         'VerticalAlignment','middle','horizontalAlignment','center')
     axis off
     
@@ -125,7 +130,7 @@ if 0
     end
     xlim(xlims);ylim([0.5 2.5])
     plot([0.5 0.5],ylim,'--','color',0.3*ones(3,1),'linewidth',2)
-    set(gca,'LineWidth',2,'FontSize',fontSize, 'fontWeight','normal')
+    set(gca,'LineWidth',2,'FontSize',fontSizeAxis, 'fontWeight','normal')
     set(gca,'xtick',ticks,'xtickLabel',ticks,'ytick',[])
     set(gca,'box','off')
     
@@ -146,7 +151,7 @@ if 0
         cnt = cnt + nChanPerROI(r);
     end
     plot(xlim,[0.5 0.5],'--','color',0.3*ones(3,1),'linewidth',2)
-    set(gca,'LineWidth',2,'FontSize',fontSize,'fontWeight','normal')
+    set(gca,'LineWidth',2,'FontSize',fontSizeAxis,'fontWeight','normal')
     set(gca,'ytick',ticks,'ytickLabel',ticks,'xtick',[])
     
     % legend
@@ -155,20 +160,20 @@ if 0
     plot([0.3],[1],'o','color',colors{2},'markersize',15,'markerfacecolor',colors{2})
     
     xlim([0 1]); ylim([0 3])
-    text(0.5,2,'IPS','fontsize',fontSize)
-    text(0.5,1,'SPL','fontsize',fontSize)
+    text(0.5,2,'IPS','fontsize',fontSizeAxis)
+    text(0.5,1,'SPL','fontsize',fontSizeAxis)
     set(gca,'visible','off')
     
-    %%  plots for ROI level
-    
-    axes('position', [0.1+vBarW+scatterW+0.02, 0.95, 0.3 0.05])
-    text(0.05,0.45,' b ','fontsize',28)
+    %  plots for ROI level
+    secondColxPos = 0.25+vBarW+scatterW;
+    axes('position',[secondColxPos-0.1 , 0.95, 0.3 0.05])
+    text(0.05,0.45,' c ','fontsize',28)
     set(gca,'visible','off')
     
-    axes('position', [0.1+vBarW+scatterW+0.08, yPos(2), 2*vBarW vBarH])
+    axes('position', [secondColxPos, yPos(2), 2*vBarW vBarH])
     plot([0 3],[0.5 0.5], '--', 'color', 0.3*ones(3,1), 'linewidth',2);hold on;
     xlim([0.5 2.5]); ylim(ylims);
-    set(gca,'linewidth',2, 'fontsize', fontSize, 'box','off')
+    set(gca,'linewidth',2, 'fontsize', fontSizeAxis, 'box','off')
     set(gca,'xtick',[1 2], 'xtickLabel', {'stim', 'resp'})
     set(gca,'ytick',ticks,'ytickLabel',ticks)
     
@@ -199,107 +204,49 @@ if 0
         end
     end
     
-    axes('position', [0.1+vBarW+scatterW+0.06, yPos(1)-0.03, vBarW*2, hBarH]); hold on;
-    for ss=1:5
-        plot(0.2*ss,0.5,subSymbols{ss},'color',0.3*ones(3,1),'markersize',10,'markerfacecolor',0.3*ones(3,1))
-        text(0.2*ss,0,['S' num2str(ss)],'fontsize',fontSize,'VerticalAlignment','top','horizontalAlignment','center')
-    end
+    % ylabel axes
+     axes('position',[secondColxPos-0.1,yPos(2),xPos(1),vBarH])
+    text(0.2,0.5,' Accuracy','fontsize',fontSizeLabels,'rotation',90, ...
+        'VerticalAlignment','middle','horizontalAlignment','center')
     axis off
     
-    %%
-    cPath = pwd;
-    cd(opts.savePath)
-    addpath(cPath)
-    addpath([cPath '/Plotting/'])
-    
-    filename = 'Fig3aHGP_ACC';
-    plot2svg([filename '.svg'],f)
-    eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
-    
-    cd(cPath)
-end
-%% renderings
-if 0
-    
-    hem=1;
-    chans   = data1.hemChanId == hem ;
-    limits = opts.rendLimits-opts.baseLineY;
-    opts.limitDw = limits(1);
-    opts.limitUp = limits(2);
-    opts.absLevel = 0.03;
-    opts.renderType = 'SmoothCh';
-    opts.hem        = hem_str{hem};
-    
-    f=figure(2);clf;
-    set(f,'Position',[200 200 600 1200]);
-    
-    ha = tight_subplot(2,1,0.001,0.001,0.001);
-    plotSurfaceChanWeights(ha(1), cortex{hem}, chanLocs(chans,:), data1.mBAC(chans)-0.5,opts)
-    loc_view(view{hem}(1),view{hem}(2))
-    set(gca,'clim',limits);
-    h =  title('stim-locked accuracies');
-    set(h,'units','normalized','position',[0.5 0.85 0],'fontSize',18)
-    
-    plotSurfaceChanWeights(ha(2), cortex{hem}, chanLocs(chans,:), data2.mBAC(chans)-0.5,opts)
-    loc_view(view{hem}(1),view{hem}(2))
-    set(gca,'clim',limits)
-    h =  title('RT-locked accuracies');
-    set(h,'units','normalized','position',[0.5 0.85 0],'fontSize',18)
-    
-    filename = [opts.savePath 'Fig3bHGP_acc_Renderings'];
-    print(f,'-dtiff',['-r' num2str(opts.resolution)],filename)
-    
-    %%
-    cm = colormap;
-    cm = cm(1001:2000,:);
-    f(3)=figure(3); clf;
-    set(f(3),'position',[-400,100,110,200])
-    set(f(3),'colormap',cm)
-    h=colorbar;
-    set(gca,'visible','off')
-    set(h,'position',[0.25 0.1 0.5 0.8])
-    set(h,'yTick',[1 1000],'ytickLabel',[50 75],'box','off','fontSize',20)
-    set(h,'fontweight','bold')
-    set(gcf,'paperSize',[2 3])
-    set(gcf,'paperPositionMode','auto')
-    filename = [opts.savePath 'Fig3bc_cbar'];
-    print(f(3),'-dpdf',filename)
-    
-end
+    % subject legend
+    axes('position', [secondColxPos, yPos(1)-0.03, 0.2, hBarH]); hold on;
+    for ss=1:5
+        plot(0.16*ss,0.5,subSymbols{ss},'color',0.3*ones(3,1),'markersize',10,'markerfacecolor',0.3*ones(3,1))
+        text(0.16*ss,0,['S' num2str(ss)],'fontsize',fontSizeAxis-1,'VerticalAlignment','top','horizontalAlignment','center')
+    end
+    axis off
+   
 
-%% weights
-
-if 1
-    t{1} = 0.05:0.1:1;
+% bottom panel 
+t{1} = 0.05:0.1:1;
     t{2} = -0.75:0.1:0.2;
     % second version, including only channels with significant decodign
     % accuracy
     X{1} = squeeze(data1.chModel);
     X{2} = squeeze(data2.chModel);
     
-    Y{1} = data1.pBAC;
-    Y{2} = data2.pBAC;
+    Y{1} = data1.mBAC;
+    Y{2} = data2.mBAC;
     
-    yLimits = [-0.06 0.1];
+    perfThr = 0.52;
+    
+    yLimits = [-0.1 0.15];
     sigBar      = cell(2,1);
-    sigBar{1}   = [0.091 0.091];
-    sigBar{2}   = [0.095 0.095];
+    sigBar{1}   = 0.95*yLimits(2)*ones(1,2);
+    sigBar{2}   = 0.97*yLimits(2)*ones(1,2);
     
     pThr = 0.005;
     timeTicks   = [0:0.2:1; -0.8:0.2:0.2];
-    yTicks      = [-0.05 0 0.05];
-    
-    f(6) = figure(6); clf;
-    figW = 900;
-    figH = 300;
-    
-    set(gcf,'position',[200 200,figW,figH],'PaperPositionMode','auto')
+    yTicks      = [-0.05 0 0.05 0.10];
+
     ha = tight_subplot(1,2);
     
     lMargin = 0.1;
-    bMargin = 0.1;
+    bMargin = 0.07;
     
-    subAxH      = 0.85;
+    subAxH      = 0.25;
     subAxW      = 0.4;
     betweenColSpace = 0.01;
     
@@ -308,8 +255,8 @@ if 1
     
     yRefLims    = [yLimits(1)*0.3 yLimits(2)*0.3];
     
-    chIdx{1}   = (data1.ROIid==1) & (data1.hemChanId==1) & (Y{1} < 0.05) & (Y{2} < 0.05);
-    chIdx{2}   = (data1.ROIid==2) & (data1.hemChanId==1) & (Y{1} < 0.05) & (Y{2} < 0.05);
+    chIdx{1}   = (data1.ROIid==1) & (data1.hemChanId==1) & (Y{1} >= perfThr) & (Y{2} >= perfThr);
+    chIdx{2}   = (data1.ROIid==2) & (data1.hemChanId==1) & (Y{1} >= perfThr) & (Y{2} >= perfThr);
     
     for col = 1:2
         axes(ha(col)); cla;
@@ -341,20 +288,20 @@ if 1
         end
         
         
-        set(gca,'fontsize',18,'fontWeight','normal')
+        set(gca,'fontsize',fontSizeAxis,'fontWeight','normal')
         set(gca,'ytick',yTicks)
-        set(gca,'yticklabel',{num2str(yTicks(1)),'0',num2str(yTicks(3))})
+        set(gca,'yticklabel',yTicks)
         set(gca,'xtick', timeTicks(col,:))
         
-        if (col==1) % left upper plot
-            xx=legend([hh.h1.mainLine,hh.h2.mainLine],'IPS','SPL');
-            set(xx,'box','off','location','northwest')
+        if (col==1) 
+%             xx=legend([hh.h1.mainLine,hh.h2.mainLine],'IPS','SPL');
+%             set(xx,'box','off','location','northwest')
             set(gca,'XtickLabel',{'stim','','0.4','','0.8',''})
             xlim([-0.1 1.02])
             set(yy(10),'Xdata',[-0.1 1.02])
         end
         
-        if (col==2) % lower right plot
+        if (col==2) 
             set(gca,'YAXisLocation','right')
             set(gca,'XtickLabel',{'-0.8','','-0.4','','resp',''})
             xlim([-0.9 0.22])
@@ -363,22 +310,31 @@ if 1
         
     end
     
-    axes('position', [0 bMargin 0.06 0.85])
-    text(0.3,0.5,' Decoder Weights (au) ','fontsize',20,'rotation',90, ...
+    axes('position', [0 bMargin 0.06 subAxH])
+    text(0.3,0.5,' Decoder Weights (au) ','fontsize',fontSizeLabels,'rotation',90, ...
         'VerticalAlignment','middle','horizontalAlignment','center')
     set(gca,'visible','off')
+
+    axes('position', [0.001 0.35 0.3 0.05]); xlim([0 1]); ylim([0 1])
+    text(0.05,0.43,' b ','fontsize',28)
+    set(gca,'visible','off')
     
+    axes('position', [0 0 1 0.05]); xlim([0 1]); ylim([0 1])
+    text(0.45,0.45,' Time (s) ','fontsize',fontSizeLabels)
+    set(gca,'visible','off')
+    
+    %%
     cPath = pwd;
-    cd(SupPlotPath)
+    cd(opts.savePath)
     addpath(cPath)
     addpath([cPath '/Plotting/'])
     
-    filename = 'sFig9_chDec-Weights-HGP';
-    plot2svg([filename '.svg'],gcf)
+    filename = 'Fig3_HGP_ACC_We';
+    plot2svg([filename '.svg'],f)
     eval(['!' inkscapePath ' -z ' filename '.svg --export-pdf=' filename '.pdf'])
+    
     cd(cPath)
 end
 
-
-
+   
 

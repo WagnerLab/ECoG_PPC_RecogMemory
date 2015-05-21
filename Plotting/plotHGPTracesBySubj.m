@@ -54,6 +54,7 @@ set(ha(3),'position',[lMargin bMargin subAxW subAxH])
 set(ha(4),'position',[lMargin+subAxW+betweenColSpace bMargin subAxW subAxH])
 
 cnt = 1;
+sigBarH = 0.95*yLimits(2);
 
 for row = 1:2
     for colB = 1:2
@@ -79,8 +80,8 @@ for row = 1:2
         hold on;
         for ii = 1:size(sigBins,1)
             if sigBins(ii,1) >= timeLims(colB,1) & sigBins(ii,2) <= timeLims(colB,2)
-                plot(sigBins(ii,:),[1.4 1.4],'linewidth',2,'color',0.3*ones(3,1))
-                plot(mean(sigBins(ii,:)),1.4,'*','linewidth',2,'color',0.1*ones(3,1))
+                plot(sigBins(ii,:),[sigBarH sigBarH],'linewidth',2,'color',0.3*ones(3,1))
+                plot(mean(sigBins(ii,:)),sigBarH,'*','linewidth',2,'color',0.1*ones(3,1))
             end
         end
         

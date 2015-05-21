@@ -5,14 +5,16 @@ ROIs        = {'IPS','SPL','AG'};
 type        = 'BinZStat';
 center      = 0;
 
-% number of tests
-mMain          = 10;
-mInter          = 10*3;
-MAIN_alpha      = 0.05/mMain;
-INTER_alpha     = 0.05/mInter;
-
 % time bins of interest
 BOT         = find((data.Bins(:,1) >= opts.time(1)) & (data.Bins(:,2) <= opts.time(2)));
+
+alpha = 0.05;
+% number of tests
+mMain          = numel(BOT);
+mInter          = mMain*numel(ROIs);
+MAIN_alpha      = alpha/mMain;
+INTER_alpha     = alpha/mInter;
+
 
 hemChans        = [data.hemChanId==1 data.hemChanId==2];
 hemROIChans     = cell(2,3);
